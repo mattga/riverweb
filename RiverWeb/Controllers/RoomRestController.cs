@@ -98,7 +98,8 @@ namespace RiverWeb.Controllers
             return r;
         }
 
-        public HttpResponseMessage Put(string id, Song song)
+        [System.Web.Http.HttpPost]
+        public HttpResponseMessage AddSong(string id, Song song)
         {
             BaseModel status = new BaseModel();
             status.Status.Code = StatusCode.Error;
@@ -159,6 +160,38 @@ namespace RiverWeb.Controllers
                     {
                         r.Status.Code = StatusCode.AlreadyExists;
                         r.Status.Description = "Room already exists";
+                    }
+                }
+            }
+
+            return response;
+        }
+
+        [System.Web.Http.HttpPost]
+        public HttpResponseMessage JoinGroup(string id, User user)
+        {
+            BaseModel bm = new BaseModel();
+            bm.Status.Code = StatusCode.Error;
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, bm);
+
+            MySqlConnection connection = DataUtils.getConnection();
+
+            if (connection != null && user != null && user.Username != "")
+            {
+                string query = "CALL JoinRoomWithUsername(\"" + user.Username + "\",\"" + id + "\")";
+                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                if (reader.Read())
+                {
+                    if (reader.GetInt32(0) == 0)
+                    {
+                        bm.Status.Code = StatusCode.OK;
+                        bm.Status.Description = DataUtils.OK;
+                    }
+                    else
+                    {
+                        bm.Status.Code = StatusCode.AlreadyExists;
+                        bm.Status.Description = "User already exists in that room";
                     }
                 }
             }
