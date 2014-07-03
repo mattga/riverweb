@@ -68,7 +68,7 @@ namespace RiverWeb.Controllers
 
             if (connection != null && user != null)
             {
-                string query = "CALL UpdateUserIfNotExist(\"" + user.Username + "\",\"" + user.Username + "\")";
+                string query = "CALL UpdateUserIfNotExist(\"" + id + "\",\"" + user.Username + "\")";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.Read() &&
