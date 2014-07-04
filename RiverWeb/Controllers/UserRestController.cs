@@ -71,17 +71,19 @@ namespace RiverWeb.Controllers
                 string query = "CALL UpdateUserIfNotExist(\"" + id + "\",\"" + user.Username + "\")";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
-                if (reader.Read() &&
-                    reader.GetInt32(0) == 0)
+                if (reader.Read())
                 {
-                    u.Username = user.Username;
-                    u.Status.Code = StatusCode.OK;
-                    u.Status.Description = DataUtils.OK;
-                }
-                else
-                {
-                    u.Status.Code = StatusCode.AlreadyExists;
-                    u.Status.Description = "User already exists";
+                    if (reader.GetInt32(0) > 0)
+                    {
+                        u.Username = user.Username;
+                        u.Status.Code = StatusCode.OK;
+                        u.Status.Description = DataUtils.OK;
+                    }
+                    else
+                    {
+                        u.Status.Code = StatusCode.AlreadyExists;
+                        u.Status.Description = "User already exists";
+                    }
                 }
             }
 
