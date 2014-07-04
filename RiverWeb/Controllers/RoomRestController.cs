@@ -145,14 +145,16 @@ namespace RiverWeb.Controllers
 
             if (connection != null && room != null && room.RoomName != "")
             {
-                string query = "CALL CreateRoomIfNotExist(\"" + room.RoomName + "\")";
+
+                string query = "CALL CreateRoomIfNotExist(\"" + room.RoomName + "\",\"" + room.Users.ToArray()[0].User.Username + "\")";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.Read())
                 {
-                    if (reader.GetInt32(0) == 0)
+                    if (reader.GetInt32(0) > -1)
                     {
                         r.RoomName = room.RoomName;
+                        r.Users = room.Users;
                         r.Status.Code = StatusCode.OK;
                         r.Status.Description = DataUtils.OK;
                     }
