@@ -175,7 +175,7 @@ namespace RiverWeb.Controllers
         }
 
         [System.Web.Http.HttpPost]
-        public HttpResponseMessage JoinGroup(string id, User user)
+        public HttpResponseMessage JoinRoom(string id, User user)
         {
             BaseModel bm = new BaseModel();
             bm.Status.Code = StatusCode.Error;
@@ -190,15 +190,15 @@ namespace RiverWeb.Controllers
 
                 if (reader.Read())
                 {
-                    if (reader.GetInt32(0) == 0)
+                    if (reader.GetInt32(0) > 0)
                     {
                         bm.Status.Code = StatusCode.OK;
                         bm.Status.Description = DataUtils.OK;
                     }
                     else
                     {
-                        bm.Status.Code = StatusCode.AlreadyExists;
-                        bm.Status.Description = "User already exists in that room";
+                        bm.Status.Code = StatusCode.NotFound;
+                        bm.Status.Description = "Room not found";
                     }
                 }
             }
