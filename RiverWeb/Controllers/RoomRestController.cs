@@ -69,6 +69,10 @@ namespace RiverWeb.Controllers
                             s.SongId = reader.GetInt32(0);
                             s.SongName = reader.GetString(3);
                             s.SongArtist = reader.GetString(4);
+                            s.SongAlbum = reader.GetString(5);
+                            s.SongLength = reader.GetInt32(6);
+                            s.SongYear = reader.GetInt32(7);
+                            s.Tokens = reader.GetInt32(8);
 
                             r.Songs.Add(s);
                         }
@@ -99,7 +103,7 @@ namespace RiverWeb.Controllers
         }
 
         [System.Web.Http.HttpPost]
-        public HttpResponseMessage AddSong(string id, Song song)
+        public HttpResponseMessage AddSong(string id, Room room)
         {
             BaseModel status = new BaseModel();
             status.Status.Code = StatusCode.Error;
@@ -108,13 +112,14 @@ namespace RiverWeb.Controllers
 
             if (connection != null)
             {
-                string query = "CALL AddSongToRoom(\"" + id + "\",\""
-                                                        + song.ProviderId + "\",\""
-                                                        + song.SongName + "\",\""
-                                                        + song.SongArtist + "\",\""
-                                                        + song.SongAlbum + "\",\""
-                                                        + song.SongLength + "\",\""
-                                                        + song.Tokens + "\")";
+                string query = "CALL AddSongToRoom(\"" + room.RoomName + "\",\""
+                                                        + room.Users.ToArray()[0].User.Username + "\",\""
+                                                        + room.Songs.ToArray()[0].ProviderId + "\",\""
+                                                        + room.Songs.ToArray()[0].SongName + "\",\""
+                                                        + room.Songs.ToArray()[0].SongArtist + "\",\""
+                                                        + room.Songs.ToArray()[0].SongAlbum + "\",\""
+                                                        + room.Songs.ToArray()[0].SongLength + "\",\""
+                                                        + room.Songs.ToArray()[0].Tokens + "\")";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.Read())
