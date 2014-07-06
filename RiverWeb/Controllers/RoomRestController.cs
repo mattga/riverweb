@@ -66,7 +66,7 @@ namespace RiverWeb.Controllers
                         while (reader.Read())
                         {
                             s = new Song();
-                            s.SongId = reader.GetInt32(0);
+                            s.ProviderId = reader.GetString(2);
                             s.SongName = reader.GetString(3);
                             s.SongArtist = reader.GetString(4);
                             s.SongAlbum = reader.GetString(5);
