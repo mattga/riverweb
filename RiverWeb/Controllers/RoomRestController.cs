@@ -119,12 +119,13 @@ namespace RiverWeb.Controllers
                                                         + room.Songs.ToArray()[0].SongArtist + "\",\""
                                                         + room.Songs.ToArray()[0].SongAlbum + "\",\""
                                                         + room.Songs.ToArray()[0].SongLength + "\",\""
+                                                        + room.Songs.ToArray()[0].SongYear + "\",\""
                                                         + room.Songs.ToArray()[0].Tokens + "\")";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.Read())
                 {
-                    if (reader.GetInt32(0) == 0)
+                    if (reader.GetInt32(0) > 0)
                     {
                         status.Status.Code = StatusCode.OK;
                         status.Status.Description = DataUtils.OK;
