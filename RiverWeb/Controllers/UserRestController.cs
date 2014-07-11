@@ -52,6 +52,7 @@ namespace RiverWeb.Controllers
                         u.Status.Description = "User already exists";
                     }
                 }
+                connection.Close();
             }
 
             return response;
@@ -85,6 +86,7 @@ namespace RiverWeb.Controllers
                         u.Status.Description = "User already exists";
                     }
                 }
+                connection.Close();
             }
 
             return response;

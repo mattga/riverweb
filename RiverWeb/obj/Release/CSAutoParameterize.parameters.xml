@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="DefaultConnection-Web.config Connection String" description="DefaultConnection Connection String used in web.config by the application to access the database." defaultValue="Datasource=2f06236f-b5b2-4f90-806b-a346006faa0a.mysql.sequelizer.com;Database=db2f06236fb5b24f90806ba346006faa0a;uid=hfcnogebsiqefsvc;pwd=jJSkL7GajLtkfLkFkN5TfTstmjx88dFdL2v22FLtNev5586hhgaFVg8yry7AGHaf;" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\MattG\\documents\\visual\ studio\ 2013\\Projects\\RiverWeb\\RiverWeb\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='DefaultConnection']/@connectionString" />
+  </parameter>
+  <parameter name="RiverWeb.Models.RoomDBContext-Web.config Connection String" description="RiverWeb.Models.RoomDBContext Connection String used in web.config by the application to access the database." defaultValue="RiverWeb.Models.RoomDBContext_ConnectionString" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\MattG\\documents\\visual\ studio\ 2013\\Projects\\RiverWeb\\RiverWeb\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='RiverWeb.Models.RoomDBContext']/@connectionString" />
+  </parameter>
+  <parameter name="RiverWeb.Models.SongDbContext-Web.config Connection String" description="RiverWeb.Models.SongDbContext Connection String used in web.config by the application to access the database." defaultValue="RiverWeb.Models.SongDbContext_ConnectionString" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\MattG\\documents\\visual\ studio\ 2013\\Projects\\RiverWeb\\RiverWeb\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='RiverWeb.Models.SongDbContext']/@connectionString" />
+  </parameter>
+  <parameter name="RiverWeb.Models.UserDBContext-Web.config Connection String" description="RiverWeb.Models.UserDBContext Connection String used in web.config by the application to access the database." defaultValue="RiverWeb.Models.UserDBContext_ConnectionString" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\MattG\\documents\\visual\ studio\ 2013\\Projects\\RiverWeb\\RiverWeb\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='RiverWeb.Models.UserDBContext']/@connectionString" />
+  </parameter>
+</parameters>

@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="DefaultConnection-Web.config Connection String" description="DefaultConnection Connection String used in web.config by the application to access the database." defaultValue="Datasource=riverdb.cdhmxsuad3sl.us-west-2.rds.amazonaws.com;Database=RiverDB;uid=riverjukebox;pwd=poTAtos4l4d;" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\RiverWeb\\RiverWeb\\obj\\Debug\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='DefaultConnection']/@connectionString" />
+  </parameter>
+</parameters>

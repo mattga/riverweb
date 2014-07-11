@@ -35,6 +35,7 @@ namespace RiverWeb.Controllers
 
                     rs.Add(r);
                 }
+                connection.Close();
             }
 
             return rs;
@@ -97,6 +98,7 @@ namespace RiverWeb.Controllers
                         }
                     }
                 }
+                connection.Close();
             }
 
             return r;
@@ -136,6 +138,7 @@ namespace RiverWeb.Controllers
                         status.Status.Description = "Points added to existing song";
                     }
                 }
+                connection.Close();
             }
 
             return response;
@@ -170,6 +173,7 @@ namespace RiverWeb.Controllers
                         r.Status.Description = "Room already exists";
                     }
                 }
+                connection.Close();
             }
 
             return response;
@@ -202,6 +206,7 @@ namespace RiverWeb.Controllers
                         bm.Status.Description = "Room not found";
                     }
                 }
+                connection.Close();
             }
 
             return response;

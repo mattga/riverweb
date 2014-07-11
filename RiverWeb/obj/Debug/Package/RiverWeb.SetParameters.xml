@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <setParameter name="IIS Web Application Name" value="Default Web Site/RiverWeb_deploy" />
+  <setParameter name="DefaultConnection-Web.config Connection String" value="Datasource=riverdb.cdhmxsuad3sl.us-west-2.rds.amazonaws.com;Database=RiverDB;uid=riverjukebox;pwd=poTAtos4l4d;" />
+</parameters>

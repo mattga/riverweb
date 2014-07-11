@@ -38,6 +38,7 @@ namespace RiverWeb.Controllers
                     status.Status.Code = StatusCode.Error;
                     status.Status.Description = "No song set to played";
                 }
+                connection.Close();
             }
 
             return response;
@@ -64,6 +65,7 @@ namespace RiverWeb.Controllers
                     status.Status.Code = StatusCode.Error;
                     status.Status.Description = "No song set to played";
                 }
+                connection.Close();
             }
 
             return status;
