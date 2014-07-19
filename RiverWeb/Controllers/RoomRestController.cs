@@ -74,6 +74,8 @@ namespace RiverWeb.Controllers
                             s.SongLength = reader.GetInt32(6);
                             s.SongYear = reader.GetInt32(7);
                             s.Tokens = reader.GetInt32(8);
+                            s.IsPlaying = reader.GetInt32(9);
+                            s.AlbumArtURL = reader.GetString(10);
 
                             r.Songs.Add(s);
                         }
@@ -122,6 +124,7 @@ namespace RiverWeb.Controllers
                                                         + room.Songs.ToArray()[0].SongAlbum + "\",\""
                                                         + room.Songs.ToArray()[0].SongLength + "\",\""
                                                         + room.Songs.ToArray()[0].SongYear + "\",\""
+                                                        + room.Songs.ToArray()[0].AlbumArtURL + "\",\""
                                                         + room.Songs.ToArray()[0].Tokens + "\")";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 

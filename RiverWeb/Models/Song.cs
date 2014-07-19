@@ -21,6 +21,7 @@ namespace RiverWeb.Models
         public string SongName { get; set; }
         public string SongArtist { get; set; }
         public string SongAlbum { get; set; }
+        public string AlbumArtURL { get; set; }
         public int SongLength { get; set; }
         public int SongYear { get; set; }
         public int Tokens { get; set; }

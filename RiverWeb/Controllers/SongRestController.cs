@@ -25,7 +25,7 @@ namespace RiverWeb.Controllers
 
             if (connection != null)
             {
-                string query = "CALL SetSongPlaying(\"" + room.RoomName + "\",\"" + id + "\")";
+                string query = "CALL SetSongPlaying(\"" + room.RoomName + "\",\"spotify:track:" + id + "\")";
                 int affectedRows = DataUtils.executeNonQuery(connection, query);
 
                 if (affectedRows > 0)
@@ -52,7 +52,7 @@ namespace RiverWeb.Controllers
 
             if (connection != null)
             {
-                string query = "CALL DeleteSongAndDistributeTokens(\"" + room.RoomName + "\",\"" + id + "\")";
+                string query = "CALL DeleteSongAndDistributeTokens(\"" + room.RoomName + "\",\"spotify:track:" + id + "\")";
                 int affectedRows = DataUtils.executeNonQuery(connection, query);
 
                 if (affectedRows > 0)
@@ -63,7 +63,7 @@ namespace RiverWeb.Controllers
                 else
                 {
                     status.Status.Code = StatusCode.Error;
-                    status.Status.Description = "No song set to played";
+                    status.Status.Description = "No song deleted";
                 }
                 connection.Close();
             }
