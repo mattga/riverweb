@@ -12,7 +12,7 @@ using MySql.Data.MySqlClient;
 
 namespace RiverWeb.Controllers
 {
-    public class RoomRestController : ApiController
+    public class RoomController : ApiController
     {
 
         public IEnumerable<Room> Get()

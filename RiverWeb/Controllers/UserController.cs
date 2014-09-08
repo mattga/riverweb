@@ -10,7 +10,7 @@ using RiverWeb.Utils;
 
 namespace RiverWeb.Controllers
 {
-    public class UserRestController : ApiController
+    public class UserController : ApiController
     {
         /*public IEnumerable<User> Get()
         {
@@ -141,7 +141,7 @@ namespace RiverWeb.Controllers
 
             if (connection != null && user != null && user.Username != "")
             {
-                string query = "SELECT * FROM Users WHERE Username=\"" + user.Username + "\" AND Password=\"" + user.Password + "\"";
+                string query = "SELECT * FROM Users WHERE Email=\"" + user.Email + "\" AND Password=\"" + user.Password + "\"";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.Read())
@@ -184,7 +184,7 @@ namespace RiverWeb.Controllers
 
             if (connection != null && user != null && user.Username != "")
             {
-                string query = "SELECT UserId FROM Users WHERE Username=\"" + user.Username + "\" AND IsFaceBook=\"" + user.IsFaceBook + "\"";
+                string query = "SELECT UserId FROM Users WHERE Email=\"" + user.Email + "\" AND IsFaceBook=\"" + user.IsFaceBook + "\"";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.HasRows)
@@ -227,20 +227,20 @@ namespace RiverWeb.Controllers
             {
                 string query = "";
                 int isFbInt = (user.IsFaceBook ? 1 : 0);
-                query = "SELECT UserId FROM Users WHERE Username=\"" + user.Username + "\" AND IsFaceBook=" + user.IsFaceBook;
+                query = "SELECT UserId FROM Users WHERE Email=\"" + user.Email + "\" AND IsFaceBook=" + user.IsFaceBook;
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.Read())
                 {
                     query = "UPDATE Users " +
-                        "SET Password=\"" + user.Password + "\",Username=\"" + user.Username + "\",FirstName=\"" + user.Email +
+                        "SET Password=\"" + user.Password + "\",Username=\"" + user.Username + "\",Email=\"" + user.Email +
                             "\",ImageUrl=\"" + user.ImageUrl + "\",IsFaceBook=" + user.IsFaceBook + " " +
-                        "WHERE Username = _Username AND Password = _Password";
+                        "WHERE Email = \"" + user.Email + "\" AND Password = \"" + user.Password + "\"";
                     DataUtils.executeQuery(connection, query);
                     
                     query = "SELECT UserId " +
                         "FROM Users " +
-                        "WHERE Username = \"" + user.Username + "\" AND Password = \"" + user.Password + "\"";
+                        "WHERE Email = \"" + user.Email + "\" AND Password = \"" + user.Password + "\"";
                     reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                     u.UserId = reader.GetInt32(0);
