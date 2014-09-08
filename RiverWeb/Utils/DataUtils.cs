@@ -139,92 +139,48 @@ namespace RiverWeb.Utils
             }
         }
 
-        static public String getString(IDataReader reader, String columnName)
+        static public string getString(IDataReader reader, string column)
         {
-            String data = "";
-
-            Object value = reader.GetValue(reader.GetOrdinal(columnName));
-            if (value is DBNull)
+            int index = reader.GetOrdinal(column);
+            if (reader.IsDBNull(index))
             {
-                //do nothing
-            }
-            else if (value is Guid)
-            {
-                Guid temp = (Guid)value;
-                data = "{" + temp.ToString() + "}";
-            }
-            else if (value is String)
-            {
-                data = (String)value;
-            }
-            else if (value is Int32)
-            {
-                Int32 temp = (Int32)value;
-                data = temp.ToString();
-            }
-            else if (value is Boolean)
-            {
-                Boolean temp = (Boolean)value;
-                data = temp.ToString();
-            }
-            else if (value is DateTime)
-            {
-                DateTime temp = (DateTime)value;
-                data = temp.ToShortDateString();
+                return null;
             }
 
-            return data;
+            return reader.GetString(index);
         }
 
-        static public Boolean getBoolean(IDataReader reader, String columnName)
+        static public int getInt32(IDataReader reader, string column)
         {
-            Boolean value = new Boolean();
-
-            int columnId = reader.GetOrdinal(columnName);
-            if (columnId >= 0)
+            int index = reader.GetOrdinal(column);
+            if (reader.IsDBNull(index))
             {
-                Object o = reader.GetValue(columnId);
-                if (o != DBNull.Value)
-                {
-                    value = (Boolean)o;
-                }
+                return 0;
             }
 
-            return value;
+            return reader.GetInt32(index);
         }
 
-        static public Decimal getDecimal(IDataReader reader, String column)
+        static public double getDouble(IDataReader reader, string column)
         {
-            Decimal value = new Decimal();
-
-            int columnId = reader.GetOrdinal(column);
-            if (columnId >= 0)
+            int index = reader.GetOrdinal(column);
+            if (reader.IsDBNull(index))
             {
-                Object o = reader.GetValue(columnId);
-                if (o != DBNull.Value)
-                {
-                    value = (Decimal)o;
-                }
+                return 0.00;
             }
 
-            return value;
+            return reader.GetDouble(index);
         }
 
-        static public int getInt(IDataReader reader, String column)
+        static DateTime? getDateTime(IDataReader reader, string column)
         {
-            int value = 0;
-
-            int columnId = reader.GetOrdinal(column);
-            if (columnId >= 0)
+            int index = reader.GetOrdinal(column);
+            if (reader.IsDBNull(index))
             {
-                Object o = reader.GetValue(columnId);
-                if (o != DBNull.Value)
-                {
-                    value = (Int32)o;
-                }
+                return null;
             }
 
-            return value;
+            return reader.GetDateTime(index);
         }
 
         static public Boolean hasValue(IDataReader reader, string column)
@@ -242,36 +198,6 @@ namespace RiverWeb.Utils
             }
 
             return isNotNull;
-        }
-
-        static public DateTime getDateTime(IDataReader reader, String column)
-        {
-            DateTime value = DateTime.MinValue;
-
-            int columnId = reader.GetOrdinal(column);
-            if (columnId >= 0)
-            {
-                Object o = reader.GetValue(columnId);
-                if (o != DBNull.Value)
-                {
-                    value = (DateTime)o;
-                }
-            }
-
-            return value;
-        }
-
-        static public Object getData(IDataReader reader, String column)
-        {
-            Object value = null;
-
-            int columnId = reader.GetOrdinal(column);
-            if (columnId >= 0)
-            {
-                value = reader.GetValue(columnId);
-            }
-
-            return value;
         }
 
         static public Guid getGuid(IDataReader reader, String column)
