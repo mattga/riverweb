@@ -187,12 +187,12 @@ namespace RiverWeb.Controllers
                 string query = "SELECT UserId FROM Users WHERE Email=\"" + user.Email + "\" AND IsFaceBook=\"" + user.IsFaceBook + "\"";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
-                if (reader.HasRows)
+                if (!reader.HasRows)
                 {
                     int isFbInt = (user.IsFaceBook ? 1 : 0);
                     reader.Close();
                     query = "INSERT INTO Users (Username, Password, Email, ImageUrl, IsFaceBook) " +
-                        "VALUES (\"" + user.Username + "\",\"" + user.Password + "\",\"" + user.Email + "\""
+                        "VALUES (\"" + user.Username + "\",\"" + user.Password + "\",\"" + user.Email + "\","
                             + (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ",\"" + isFbInt + "\")";
                     reader.Close();
                     reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
@@ -202,11 +202,11 @@ namespace RiverWeb.Controllers
                         bm.Status.Code = StatusCode.OK;
                         bm.Status.Description = "Success creating user.";
                     }
-                    else
-                    {
-                        bm.Status.Code = StatusCode.AlreadyExists;
-                        bm.Status.Description = "User already exists.";
-                    }
+                }
+                else
+                {
+                    bm.Status.Code = StatusCode.AlreadyExists;
+                    bm.Status.Description = "User already exists.";
                 }
                 DataUtils.closeConnection(connection);
             }

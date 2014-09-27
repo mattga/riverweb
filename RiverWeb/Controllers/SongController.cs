@@ -12,7 +12,7 @@ using MySql.Data.MySqlClient;
 
 namespace RiverWeb.Controllers
 {
-    public class SongRestController : ApiController
+    public class SongController : ApiController
     {
 
         [System.Web.Http.HttpPost]
