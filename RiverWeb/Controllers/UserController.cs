@@ -85,6 +85,49 @@ namespace RiverWeb.Controllers
             return u;
         }
 
+        // POST api/user/id/linksp
+        [HttpPost]
+        public User LinkSP(string id, string spUser, string spPass)
+        {
+            User u = new User();
+            u.Status.Code = StatusCode.Error;
+
+            MySqlConnection connection = DataUtils.getConnection();
+
+            if (connection != null && spUser != null && spPass != null)
+            {
+                string query = "INSERT INTO Hosts (UserId, spUserName, spPassword) VALUES ('" + id + "','" + spUser + "','" + spPass +")";
+                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                if (reader.Read())
+                {
+                    if (reader.HasRows)
+                    {
+                        u.UserId = DataUtils.getInt32(reader, "UserId");
+                        u.Username = DataUtils.getString(reader, "Username");
+                        u.CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate"));
+                        u.Email = DataUtils.getString(reader, "Email");
+                        u.City = DataUtils.getString(reader, "City");
+                        u.State = DataUtils.getString(reader, "State");
+                        u.Country = DataUtils.getString(reader, "Country");
+                        u.ImageUrl = DataUtils.getString(reader, "ImageUrl");
+                        u.IsFaceBook = (DataUtils.getInt32(reader, "IsFaceBook") == 0 ? false : true);
+
+                        u.Status.Code = StatusCode.OK;
+                        u.Status.Description = DataUtils.OK;
+                    }
+                }
+                else
+                {
+                    u.Status.Code = StatusCode.NotFound;
+                    u.Status.Description = "Incorrect username or password";
+                }
+                DataUtils.closeConnection(connection);
+            }
+
+            return u;
+        }
+
         // POST api/user
         [ActionName("DefaultAction")]
         public BaseModel Post(User user)
