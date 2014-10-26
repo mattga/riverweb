@@ -53,7 +53,7 @@ namespace RiverWeb.Controllers
 
             if (connection != null && user != null && user.Username != "")
             {
-                string query = "SELECT * FROM Users WHERE Email=\"" + user.Email + "\" AND Password=\"" + user.Password + "\"";
+                string query = "SELECT * FROM Users LEFT OUTER JOIN Hosts ON Users.UserId=Hosts.UserId WHERE Email=\"" + user.Email + "\" AND Password=\"" + user.Password + "\"";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.Read())
@@ -69,6 +69,11 @@ namespace RiverWeb.Controllers
                         u.Country = DataUtils.getString(reader, "Country");
                         u.ImageUrl = DataUtils.getString(reader, "ImageUrl");
                         u.IsFaceBook = (DataUtils.getInt32(reader, "IsFaceBook") == 0 ? false : true);
+
+                        u.Host = new Host();
+                        u.Host.UserId = u.UserId;
+                        u.Host.spUserName = DataUtils.getString(reader, "spUserName");
+                        u.Host.spPassword = DataUtils.getString(reader, "spPassword");
 
                         u.Status.Code = StatusCode.OK;
                         u.Status.Description = DataUtils.OK;
@@ -87,45 +92,31 @@ namespace RiverWeb.Controllers
 
         // POST api/user/id/linksp
         [HttpPost]
-        public User LinkSP(string id, string spUser, string spPass)
+        public BaseModel LinkSP(string id, Host host)
         {
-            User u = new User();
-            u.Status.Code = StatusCode.Error;
-
+            BaseModel bm = new BaseModel();
+            bm.Status.Code = StatusCode.Error;
             MySqlConnection connection = DataUtils.getConnection();
 
-            if (connection != null && spUser != null && spPass != null)
+            if (connection != null && host != null)
             {
-                string query = "INSERT INTO Hosts (UserId, spUserName, spPassword) VALUES ('" + id + "','" + spUser + "','" + spPass +")";
+                string query = "INSERT INTO Hosts (UserId, spUserName, spPassword) VALUES ('" + host.UserId + "','" + host.spUserName + "','" + host.spPassword +"')";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
-                if (reader.Read())
+                if (reader.RecordsAffected > 0)
                 {
-                    if (reader.HasRows)
-                    {
-                        u.UserId = DataUtils.getInt32(reader, "UserId");
-                        u.Username = DataUtils.getString(reader, "Username");
-                        u.CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate"));
-                        u.Email = DataUtils.getString(reader, "Email");
-                        u.City = DataUtils.getString(reader, "City");
-                        u.State = DataUtils.getString(reader, "State");
-                        u.Country = DataUtils.getString(reader, "Country");
-                        u.ImageUrl = DataUtils.getString(reader, "ImageUrl");
-                        u.IsFaceBook = (DataUtils.getInt32(reader, "IsFaceBook") == 0 ? false : true);
-
-                        u.Status.Code = StatusCode.OK;
-                        u.Status.Description = DataUtils.OK;
-                    }
+                    bm.Status.Code = StatusCode.OK;
+                    bm.Status.Description = DataUtils.OK;
                 }
                 else
                 {
-                    u.Status.Code = StatusCode.NotFound;
-                    u.Status.Description = "Incorrect username or password";
+                    bm.Status.Code = StatusCode.NotFound;
+                    bm.Status.Description = "Couldn't link Spotify account.";
                 }
                 DataUtils.closeConnection(connection);
             }
 
-            return u;
+            return bm;
         }
 
         // POST api/user

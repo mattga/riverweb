@@ -45,12 +45,11 @@ namespace RiverWeb.Models
         public string ImageUrl { get; set; }
         public bool IsFaceBook { get; set; }
 
-        public string spUserName { get; set; }
-        public string spPassword { get; set; }
+        public Host Host { get; set; }
 
         public bool ReadUser(MySqlConnection connection)
         {
-            string query = "SELECT * FROM Users LEFT OUTER JOIN Hosts ON Users.UserId=Hosts.UserId WHERE UserId = " + this.UserId;
+            string query = "SELECT * FROM Users LEFT OUTER JOIN Hosts ON Users.UserId=Hosts.UserId WHERE Users.UserId = " + this.UserId;
             MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
             if (reader.Read())
@@ -67,8 +66,10 @@ namespace RiverWeb.Models
                     this.ImageUrl = DataUtils.getString(reader, "ImageUrl");
                     this.IsFaceBook = (DataUtils.getInt32(reader, "IsFaceBook") == 0 ? false : true);
 
-                    this.spUserName = DataUtils.getString(reader, "spUserName");
-                    this.spPassword = DataUtils.getString(reader, "spPassword");
+                    this.Host = new Host();
+                    this.Host.UserId = this.UserId;
+                    this.Host.spUserName = DataUtils.getString(reader, "spUserName");
+                    this.Host.spPassword = DataUtils.getString(reader, "spPassword");
 
                     return true;
                 }
