@@ -145,10 +145,15 @@ namespace RiverWeb.Controllers
 
                     if (reader.RecordsAffected > 0)
                     {
-                        query = "LAST_INSERT_ID()";
+                        query = "SELECT LAST_INSERT_ID()";
                         reader.Close();
                         reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
-                        u.UserId = reader.GetInt32(0);
+
+                        if (reader.Read())
+                        {
+                            u.UserId = reader.GetInt32(0);
+                        }
+
                         u.Status.Code = StatusCode.OK;
                         u.Status.Description = "Success creating user.";
                     }
