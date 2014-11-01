@@ -121,10 +121,10 @@ namespace RiverWeb.Controllers
 
         // POST api/user
         [ActionName("DefaultAction")]
-        public BaseModel Post(User user)
+        public User Post(User user)
         {
-            BaseModel bm = new BaseModel();
-            bm.Status.Code = StatusCode.Error;
+            User u = new User();
+            u.Status.Code = StatusCode.Error;
 
             MySqlConnection connection = DataUtils.getConnection();
 
@@ -145,19 +145,23 @@ namespace RiverWeb.Controllers
 
                     if (reader.RecordsAffected > 0)
                     {
-                        bm.Status.Code = StatusCode.OK;
-                        bm.Status.Description = "Success creating user.";
+                        query = "LAST_INSERT_ID()";
+                        reader.Close();
+                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                        u.UserId = reader.GetInt32(0);
+                        u.Status.Code = StatusCode.OK;
+                        u.Status.Description = "Success creating user.";
                     }
                 }
                 else
                 {
-                    bm.Status.Code = StatusCode.AlreadyExists;
-                    bm.Status.Description = "User already exists.";
+                    u.Status.Code = StatusCode.AlreadyExists;
+                    u.Status.Description = "User already exists.";
                 }
                 DataUtils.closeConnection(connection);
             }
 
-            return bm;
+            return u;
         }
 
         // PUT api/user
