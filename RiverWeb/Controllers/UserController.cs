@@ -51,36 +51,42 @@ namespace RiverWeb.Controllers
 
             MySqlConnection connection = DataUtils.getConnection();
 
-            if (connection != null && user != null && user.Username != "")
+            try
             {
-                string query = "SELECT * FROM Users WHERE Email=\"" + user.Email + "\" AND Password=\"" + user.Password + "\"";
-                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
-
-                if (reader.Read())
+                if (connection != null && user != null && user.Username != "")
                 {
-                    if (reader.HasRows)
+                    string query = "SELECT * FROM Users WHERE Email=\"" + user.Email + "\" AND Password=\"" + user.Password + "\"";
+                    MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                    if (reader.Read())
                     {
-                        u.UserId = DataUtils.getInt32(reader, "UserId");
-                        u.Username = DataUtils.getString(reader, "Username");
-                        u.CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate"));
-                        u.Email = DataUtils.getString(reader, "Email");
-                        u.City = DataUtils.getString(reader, "City");
-                        u.State = DataUtils.getString(reader, "State");
-                        u.Country = DataUtils.getString(reader, "Country");
-                        u.ImageUrl = DataUtils.getString(reader, "ImageUrl");
-                        u.IsFaceBook = (DataUtils.getInt32(reader, "IsFaceBook") == 0 ? false : true);
-                        u.spUsername = DataUtils.getString(reader, "spUsername");
+                        if (reader.HasRows)
+                        {
+                            u.UserId = DataUtils.getInt32(reader, "UserId");
+                            u.Username = DataUtils.getString(reader, "Username");
+                            u.CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate"));
+                            u.Email = DataUtils.getString(reader, "Email");
+                            u.City = DataUtils.getString(reader, "City");
+                            u.State = DataUtils.getString(reader, "State");
+                            u.Country = DataUtils.getString(reader, "Country");
+                            u.ImageUrl = DataUtils.getString(reader, "ImageUrl");
+                            u.spUsername = DataUtils.getString(reader, "spUsername");
 
-                        u.Status.Code = StatusCode.OK;
-                        u.Status.Description = DataUtils.OK;
+                            u.Status.Code = StatusCode.OK;
+                            u.Status.Description = DataUtils.OK;
+                        }
                     }
+                    else
+                    {
+                        u.Status.Code = StatusCode.NotFound;
+                        u.Status.Description = "Incorrect username or password";
+                    }
+                    DataUtils.closeConnection(connection);
                 }
-                else
-                {
-                    u.Status.Code = StatusCode.NotFound;
-                    u.Status.Description = "Incorrect username or password";
-                }
-                DataUtils.closeConnection(connection);
+            }
+            catch (Exception ex)
+            {
+                u.Status.Description = ex.StackTrace;
             }
 
             return u;
