@@ -53,7 +53,7 @@ namespace RiverWeb.Controllers
 
             if (connection != null && user != null && user.Username != "")
             {
-                string query = "SELECT * FROM Users LEFT OUTER JOIN Hosts ON Users.UserId=Hosts.UserId WHERE Email=\"" + user.Email + "\" AND Password=\"" + user.Password + "\"";
+                string query = "SELECT * FROM Users WHERE Email=\"" + user.Email + "\" AND Password=\"" + user.Password + "\"";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.Read())
@@ -69,11 +69,7 @@ namespace RiverWeb.Controllers
                         u.Country = DataUtils.getString(reader, "Country");
                         u.ImageUrl = DataUtils.getString(reader, "ImageUrl");
                         u.IsFaceBook = (DataUtils.getInt32(reader, "IsFaceBook") == 0 ? false : true);
-
-                        u.Host = new Host();
-                        u.Host.UserId = u.UserId;
-                        u.Host.spUserName = DataUtils.getString(reader, "spUserName");
-                        u.Host.spPassword = DataUtils.getString(reader, "spPassword");
+                        u.spUsername = DataUtils.getString(reader, "spUsername");
 
                         u.Status.Code = StatusCode.OK;
                         u.Status.Description = DataUtils.OK;
@@ -90,35 +86,6 @@ namespace RiverWeb.Controllers
             return u;
         }
 
-        // POST api/user/id/linksp
-        [HttpPost]
-        public BaseModel LinkSP(string id, Host host)
-        {
-            BaseModel bm = new BaseModel();
-            bm.Status.Code = StatusCode.Error;
-            MySqlConnection connection = DataUtils.getConnection();
-
-            if (connection != null && host != null)
-            {
-                string query = "INSERT INTO Hosts (UserId, spUserName, spPassword) VALUES ('" + host.UserId + "','" + host.spUserName + "','" + host.spPassword +"')";
-                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
-
-                if (reader.RecordsAffected > 0)
-                {
-                    bm.Status.Code = StatusCode.OK;
-                    bm.Status.Description = DataUtils.OK;
-                }
-                else
-                {
-                    bm.Status.Code = StatusCode.NotFound;
-                    bm.Status.Description = "Couldn't link Spotify account.";
-                }
-                DataUtils.closeConnection(connection);
-            }
-
-            return bm;
-        }
-
         // POST api/user
         [ActionName("DefaultAction")]
         public User Post(User user)
@@ -130,16 +97,16 @@ namespace RiverWeb.Controllers
 
             if (connection != null && user != null && user.Username != "")
             {
-                string query = "SELECT UserId FROM Users WHERE Email=\"" + user.Email + "\" AND IsFaceBook=\"" + user.IsFaceBook + "\"";
+                string query = "SELECT UserId FROM Users WHERE Email=\"" + user.Email + "\"";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (!reader.HasRows)
                 {
                     int isFbInt = (user.IsFaceBook ? 1 : 0);
                     reader.Close();
-                    query = "INSERT INTO Users (Username, Password, Email, ImageUrl, IsFaceBook) " +
+                    query = "INSERT INTO Users (Username, Password, Email, ImageUrl) " +
                         "VALUES (\"" + user.Username + "\",\"" + user.Password + "\",\"" + user.Email + "\","
-                            + (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ",\"" + isFbInt + "\")";
+                            + (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ")";
                     reader.Close();
                     reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
@@ -189,7 +156,7 @@ namespace RiverWeb.Controllers
                 {
                     query = "UPDATE Users " +
                         "SET Password=\"" + user.Password + "\",Username=\"" + user.Username + "\",Email=\"" + user.Email +
-                            "\",ImageUrl=\"" + user.ImageUrl + "\",IsFaceBook=" + user.IsFaceBook + " " +
+                            "\",ImageUrl=\"" + user.ImageUrl + "\" " +
                         "WHERE Email = \"" + user.Email + "\" AND Password = \"" + user.Password + "\"";
                     DataUtils.executeQuery(connection, query);
                     
@@ -207,9 +174,9 @@ namespace RiverWeb.Controllers
                 }
                 else
                 {
-                    query = " INSERT INTO Users (Username, Password, FirstName, LastName, ImageUrl, IsFaceBook) " +
+                    query = " INSERT INTO Users (Username, Password, FirstName, LastName, ImageUrl) " +
                         "VALUES (\"" + user.Username + "\", \"" + user.Password + "\", \"" + user.Email + "\", " +
-                        (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ", " + user.IsFaceBook + ")";
+                        (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ")";
                     DataUtils.executeQuery(connection, query);
 
                     reader.Close();

@@ -49,7 +49,7 @@ namespace RiverWeb.Models
 
         public bool ReadUser(MySqlConnection connection)
         {
-            string query = "SELECT * FROM Users LEFT OUTER JOIN Hosts ON Users.UserId=Hosts.UserId WHERE Users.UserId = " + this.UserId;
+            string query = "SELECT * FROM Users WHERE Users.UserId = " + this.UserId;
             MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
             if (reader.Read())
@@ -64,18 +64,15 @@ namespace RiverWeb.Models
                     this.State = DataUtils.getString(reader, "State");
                     this.Country = DataUtils.getString(reader, "Country");
                     this.ImageUrl = DataUtils.getString(reader, "ImageUrl");
-                    this.IsFaceBook = (DataUtils.getInt32(reader, "IsFaceBook") == 0 ? false : true);
-
-                    this.Host = new Host();
-                    this.Host.UserId = this.UserId;
-                    this.Host.spUserName = DataUtils.getString(reader, "spUserName");
-                    this.Host.spPassword = DataUtils.getString(reader, "spPassword");
+                    this.Host.spUserName = DataUtils.getString(reader, "spUsername");
 
                     return true;
                 }
             }
             return false;
         }
+
+        public string spUsername { get; set; }
     }
 
     public class UserDBContext : DbContext
