@@ -43,9 +43,7 @@ namespace RiverWeb.Models
         public string State { get; set; }
         public string Country { get; set; }
         public string ImageUrl { get; set; }
-        public bool IsFaceBook { get; set; }
-
-        public Host Host { get; set; }
+        public string spUsername { get; set; }
 
         public bool ReadUser(MySqlConnection connection)
         {
@@ -64,15 +62,13 @@ namespace RiverWeb.Models
                     this.State = DataUtils.getString(reader, "State");
                     this.Country = DataUtils.getString(reader, "Country");
                     this.ImageUrl = DataUtils.getString(reader, "ImageUrl");
-                    this.Host.spUserName = DataUtils.getString(reader, "spUsername");
+                    this.spUsername = DataUtils.getString(reader, "spUsername");
 
                     return true;
                 }
             }
             return false;
         }
-
-        public string spUsername { get; set; }
     }
 
     public class UserDBContext : DbContext
