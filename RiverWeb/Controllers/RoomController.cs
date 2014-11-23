@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Http;
 using System.Net;
+using System.Web.Http;
 using System.Net.Http;
 using RiverWeb.Models;
 using RiverWeb.Utils;
@@ -14,7 +12,6 @@ namespace RiverWeb.Controllers
 {
     public class RoomController : ApiController
     {
-
         public IEnumerable<Room> Get()
         {
             List<Room> rs = new List<Room>();
@@ -146,9 +143,10 @@ namespace RiverWeb.Controllers
 
             return response;
         }
-
+        
+        [ActionName("DefaultAction")]
         public Room Post(Room room)
-        {
+        { 
             Room r = new Room();
             r.Status.Code = StatusCode.Error;
             HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, r);
