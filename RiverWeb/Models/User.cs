@@ -12,26 +12,6 @@ using MySql.Data.MySqlClient;
 namespace RiverWeb.Models
 {
     [Table("Users")]
-    /*public class User : BaseModel
-    {
-        [JsonIgnore]
-        public int UserId { get; set; }
-        public String Username { get; set; }
-
-    }
-
-    public class UserDBContext : DbContext
-    {
-        public UserDBContext()
-            : base("DefaultConnection")
-        {
-
-        }
-
-        public DbSet<User> Users { get; set; }
-    }*/
-
-
     public class User : BaseModel
     {
         public int UserId { get; set; }

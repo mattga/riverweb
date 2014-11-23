@@ -157,7 +157,7 @@ namespace RiverWeb.Controllers
             {
 
                 string query = "INSERT INTO Rooms " + 
-                                "(HostId,RoomName,isPrivate" + (room.isPrivate ? ",AccessCode," : ",") + "Latitude,Longiture) " +
+                                "(HostId,RoomName,isPrivate" + (room.isPrivate ? ",AccessCode," : ",") + "Latitude,Longitude) " +
                                 "VALUES (" + room.HostId + ",'" + room.RoomName + "'," + room.isPrivate +
                                 (room.isPrivate ? ","+room.AccessCode : "" ) + "," + room.Latitude + "," + room.Longitude + ")";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
