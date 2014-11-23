@@ -108,7 +108,6 @@ namespace RiverWeb.Controllers
 
                 if (!reader.HasRows)
                 {
-                    reader.Close();
                     query = "INSERT INTO Users (Username, Password, Email, ImageUrl) " +
                         "VALUES (\"" + user.Username + "\",\"" + user.Password + "\",\"" + user.Email + "\","
                             + (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ")";
@@ -150,38 +149,35 @@ namespace RiverWeb.Controllers
 
             if (connection != null &&user != null)
             {
-                string query = "SELECT * FROM Users WHERE spUserName='" + user.spUsername + "'";
+                string query = "SELECT * FROM Users WHERE spEmail='" + user.spEmail + "'";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.Read())
                 {
-                    if (reader.HasRows)
-                    {
-                        u.UserId = DataUtils.getInt32(reader, "UserId");
-                    }
-                    else
-                    {
-                        query = "INSERT INTO Users (spUsername, spCanonicalUsername, Email) VALUES ('" + user.spUsername +
-                            "',;" + user.spCanonicalUsername + "','" + user.Email + "')";
-                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
-
-                        if (reader.RecordsAffected > 0)
-                        {
-                            query = "SELECT LAST_INSERT_ID()";
-                            reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
-
-                            if (reader.Read())
-                            {
-                                u.UserId = reader.GetInt32(0);
-                            }
-                        }
-                    }
+                    u.UserId = DataUtils.getInt32(reader, "UserId");
 
                     u.Status.Code = StatusCode.OK;
                     u.Status.Description = DataUtils.OK;
                 }
                 else
                 {
+                    query = "INSERT INTO Users (spUsername, spCanonicalUsername, spEmail) VALUES ('" + user.spUsername +
+                            "','" + user.spCanonicalUsername + "','" + user.spEmail + "')";
+                    reader.Close();
+                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                    if (reader.RecordsAffected > 0)
+                    {
+                        query = "SELECT LAST_INSERT_ID()";
+                        reader.Close();
+                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                        if (reader.Read())
+                        {
+                            u.UserId = reader.GetInt32(0);
+                        }
+                    }
+
                     u.Status.Code = StatusCode.NotFound;
                     u.Status.Description = "Could not link Spotify account.";
                 }
