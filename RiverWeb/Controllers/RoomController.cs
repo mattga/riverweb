@@ -158,7 +158,10 @@ namespace RiverWeb.Controllers
             if (connection != null && room != null && room.RoomName != "")
             {
 
-                string query = "CALL CreateRoomIfNotExist(\"" + room.RoomName + "\",\"" + room.Users.ToArray()[0].User.Username + "\")";
+                string query = "INSERT INTO Rooms " + 
+                                "(RoomName,isPrivate" + (room.isPrivate ? ",AccessCode," : ",") + "Latitude,Longiture) " +
+                                "VALUES ('" + room.RoomName + "'," + room.isPrivate + (room.isPrivate ? ","+room.AccessCode : "" ) +
+                                "," + room.Latitude + "," + room.Longitude + ")";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.Read())

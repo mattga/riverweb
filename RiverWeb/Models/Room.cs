@@ -17,6 +17,11 @@ namespace RiverWeb.Models
         [JsonIgnore]
         public int HostId { get; set; }
         public string RoomName { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public bool isPrivate { get; set; }
+        [JsonIgnore]
+        public int AccessCode { get; set; }
 
         public virtual ICollection<Song> Songs { get; set; }
         public virtual ICollection<RoomUser> Users { get; set; }
