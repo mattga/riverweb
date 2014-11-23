@@ -157,7 +157,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\BaseModel.cs" />
-    <Compile Include="Models\Host.cs" />
     <Compile Include="Models\Room.cs" />
     <Compile Include="Models\Song.cs" />
     <Compile Include="Models\User.cs" />
@@ -272,7 +271,9 @@
     <Folder Include="Areas\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

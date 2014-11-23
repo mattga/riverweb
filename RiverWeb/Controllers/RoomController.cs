@@ -147,7 +147,7 @@ namespace RiverWeb.Controllers
             return response;
         }
 
-        public HttpResponseMessage Post(Room room)
+        public Room Post(Room room)
         {
             Room r = new Room();
             r.Status.Code = StatusCode.Error;
@@ -159,17 +159,24 @@ namespace RiverWeb.Controllers
             {
 
                 string query = "INSERT INTO Rooms " + 
-                                "(RoomName,isPrivate" + (room.isPrivate ? ",AccessCode," : ",") + "Latitude,Longiture) " +
-                                "VALUES ('" + room.RoomName + "'," + room.isPrivate + (room.isPrivate ? ","+room.AccessCode : "" ) +
-                                "," + room.Latitude + "," + room.Longitude + ")";
+                                "(HostId,RoomName,isPrivate" + (room.isPrivate ? ",AccessCode," : ",") + "Latitude,Longiture) " +
+                                "VALUES (" + room.HostId + ",'" + room.RoomName + "'," + room.isPrivate +
+                                (room.isPrivate ? ","+room.AccessCode : "" ) + "," + room.Latitude + "," + room.Longitude + ")";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 if (reader.Read())
                 {
-                    if (reader.GetInt32(0) > -1)
+                    if (reader.RecordsAffected > -1)
                     {
                         r.RoomName = room.RoomName;
-                        r.Users = room.Users;
+
+                        query = "SELECT LAST_INSERT_ID()";
+                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                        if (reader.Read())
+                        {
+                            r.RoomId = reader.GetInt32(0);
+                        }
+
                         r.Status.Code = StatusCode.OK;
                         r.Status.Description = DataUtils.OK;
                     }
@@ -182,7 +189,7 @@ namespace RiverWeb.Controllers
                 connection.Close();
             }
 
-            return response;
+            return r;
         }
 
         [System.Web.Http.HttpPost]
