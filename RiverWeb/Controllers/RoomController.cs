@@ -149,7 +149,6 @@ namespace RiverWeb.Controllers
         { 
             Room r = new Room();
             r.Status.Code = StatusCode.Error;
-            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, r);
 
             MySqlConnection connection = DataUtils.getConnection();
 
@@ -162,28 +161,27 @@ namespace RiverWeb.Controllers
                                 (room.isPrivate ? ","+room.AccessCode : "" ) + "," + room.Latitude + "," + room.Longitude + ")";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
-                if (reader.Read())
+                if (reader.RecordsAffected > -1)
                 {
-                    if (reader.RecordsAffected > -1)
-                    {
-                        r.RoomName = room.RoomName;
+                    r.RoomName = room.RoomName;
 
-                        query = "SELECT LAST_INSERT_ID()";
-                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
-                        if (reader.Read())
-                        {
-                            r.RoomId = reader.GetInt32(0);
-                        }
-
-                        r.Status.Code = StatusCode.OK;
-                        r.Status.Description = DataUtils.OK;
-                    }
-                    else
+                    query = "SELECT LAST_INSERT_ID()";
+                    reader.Close();
+                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    if (reader.Read())
                     {
-                        r.Status.Code = StatusCode.AlreadyExists;
-                        r.Status.Description = "Room already exists";
+                        r.RoomId = reader.GetInt32(0);
                     }
+
+                    r.Status.Code = StatusCode.OK;
+                    r.Status.Description = DataUtils.OK;
                 }
+                else
+                {
+                    r.Status.Code = StatusCode.AlreadyExists;
+                    r.Status.Description = "Room already exists";
+                }
+
                 connection.Close();
             }
 
