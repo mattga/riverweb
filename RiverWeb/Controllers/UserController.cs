@@ -143,30 +143,51 @@ namespace RiverWeb.Controllers
 
         // POST api/user/id/linkspotify
         [HttpPost]
-        public BaseModel LinkSpotify(string id, User user) {
-            BaseModel bm = new BaseModel();
-            bm.Status.Code = StatusCode.Error;
+        public User LinkSpotify(string id, User user) {
+            User u = new User();
+            u.Status.Code = StatusCode.Error;
             MySqlConnection connection = DataUtils.getConnection();
 
             if (connection != null &&user != null)
             {
-                string query = "UPDATE Users SET spUserName='" + user.spUsername + "' WHERE)";
+                string query = "SELECT * FROM Users WHERE spUserName='" + user.spUsername + "'";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
-                if (reader.RecordsAffected > 0)
+                if (reader.Read())
                 {
-                    bm.Status.Code = StatusCode.OK;
-                    bm.Status.Description = DataUtils.OK;
+                    if (reader.HasRows)
+                    {
+                        u.UserId = DataUtils.getInt32(reader, "UserId");
+                    }
+                    else
+                    {
+                        query = "INSERT INTO Users (spUsername) VALUES ('" + user.spUsername + "')";
+                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                        if (reader.RecordsAffected > 0)
+                        {
+                            query = "SELECT LAST_INSERT_ID()";
+                            reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                            if (reader.Read())
+                            {
+                                u.UserId = reader.GetInt32(0);
+                            }
+                        }
+                    }
+
+                    u.Status.Code = StatusCode.OK;
+                    u.Status.Description = DataUtils.OK;
                 }
                 else
                 {
-                    bm.Status.Code = StatusCode.NotFound;
-                    bm.Status.Description = "Could not link Spotify account.";
+                    u.Status.Code = StatusCode.NotFound;
+                    u.Status.Description = "Could not link Spotify account.";
                 }
                 DataUtils.closeConnection(connection);
             }
 
-            return bm;
+            return u;
         }
 
         // PUT api/user
