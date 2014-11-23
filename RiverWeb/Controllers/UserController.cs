@@ -161,8 +161,8 @@ namespace RiverWeb.Controllers
                     }
                     else
                     {
-                        query = "INSERT INTO Users (spUsername, DisplayName, Email) VALUES ('" + user.spUsername +
-                            "',;" + user.DisplayName + "','" + user.Email + "')";
+                        query = "INSERT INTO Users (spUsername, spCanonicalUsername, Email) VALUES ('" + user.spUsername +
+                            "',;" + user.spCanonicalUsername + "','" + user.Email + "')";
                         reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                         if (reader.RecordsAffected > 0)

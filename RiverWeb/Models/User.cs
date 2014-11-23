@@ -18,13 +18,13 @@ namespace RiverWeb.Models
         public string Username { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
-        public string DisplayName { get; set; }
         public DateTime CreatedDate { get; set; }
         public string City { get; set; }
         public string State { get; set; }
         public string Country { get; set; }
         public string ImageUrl { get; set; }
         public string spUsername { get; set; }
+        public string spCanonicalUsername { get; set; }
 
         public bool ReadUser(MySqlConnection connection)
         {
