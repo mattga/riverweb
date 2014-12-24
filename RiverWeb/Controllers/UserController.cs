@@ -193,7 +193,7 @@ namespace RiverWeb.Controllers
 
                     if (reader.RecordsAffected > 0)
                     {
-                        query = "SELECT LAST_UPDATE_ID()";
+                        query = "SELECT LAST_INSERT_ID()";
                         reader.Close();
                         reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
