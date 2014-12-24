@@ -191,17 +191,7 @@ namespace RiverWeb.Controllers
                     reader.Close();
                     reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
-                    if (reader.RecordsAffected > 0)
-                    {
-                        query = "SELECT LAST_INSERT_ID()";
-                        reader.Close();
-                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
-
-                        if (reader.Read())
-                        {
-                            u.UserId = reader.GetInt32(0);
-                        }
-                    }
+                    u.UserId = Convert.ToInt32(id);
 
                     u.Status.Code = StatusCode.OK;
                     u.Status.Description = "Spotify information linked to account.";
