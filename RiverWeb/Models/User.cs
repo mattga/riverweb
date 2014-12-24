@@ -23,6 +23,9 @@ namespace RiverWeb.Models
         public string State { get; set; }
         public string Country { get; set; }
         public string ImageUrl { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+
         public string spUsername { get; set; }
         public string spCanonicalUsername { get; set; }
         public string spEmail { get; set; }

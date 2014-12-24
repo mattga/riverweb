@@ -155,11 +155,12 @@ namespace RiverWeb.Controllers
                 if (reader.Read())
                 {
                     u.UserId = DataUtils.getInt32(reader, "UserId");
+                    u.Email = DataUtils.getString(reader, "Email");
 
-                    u.Status.Code = StatusCode.OK;
-                    u.Status.Description = DataUtils.OK;
+                    u.Status.Code = StatusCode.AlreadyExists;
+                    u.Status.Description = "Spotify account already linked to a user.";
                 }
-                else
+                else if (id == "")
                 {
                     query = "INSERT INTO Users (spUsername, spCanonicalUsername, spEmail) VALUES ('" + user.spUsername +
                             "','" + user.spCanonicalUsername + "','" + user.spEmail + "')";
@@ -179,8 +180,33 @@ namespace RiverWeb.Controllers
                     }
 
                     u.Status.Code = StatusCode.NotFound;
-                    u.Status.Description = "Could not link Spotify account.";
+                    u.Status.Description = "New account created with spotidy information.";
                 }
+                else
+                {
+                    query = "UPDATE Users SET spUsername='" + user.spUsername + 
+                        "', spCanonicalUsername='" + user.spCanonicalUsername + 
+                        "', spEmail='" + user.spEmail + "'" + 
+                        "WHERE UserId=" + id;
+                    reader.Close();
+                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                    if (reader.RecordsAffected > 0)
+                    {
+                        query = "SELECT LAST_UPDATE_ID()";
+                        reader.Close();
+                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                        if (reader.Read())
+                        {
+                            u.UserId = reader.GetInt32(0);
+                        }
+                    }
+
+                    u.Status.Code = StatusCode.OK;
+                    u.Status.Description = "Spotify information linked to account.";
+                }
+
                 DataUtils.closeConnection(connection);
             }
 

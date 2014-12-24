@@ -220,5 +220,58 @@ namespace RiverWeb.Controllers
 
             return response;
         }
+
+        [System.Web.Http.HttpPost]
+        public HttpResponseMessage JoinNearest(string id, User user)
+        {
+            BaseModel bm = new BaseModel();
+            bm.Status.Code = StatusCode.Error;
+            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, bm);
+
+            MySqlConnection connection = DataUtils.getConnection();
+
+            if (connection != null && user != null && user.Username != "")
+            {
+                string query = "SELECT *, " +
+                                "p.distance_unit " +
+                                         "* DEGREES(ACOS(COS(RADIANS(p.latpoint)) " +
+                                         "* COS(RADIANS(z.latitude)) " +
+                                         "* COS(RADIANS(p.longpoint) - RADIANS(z.longitude)) " +
+                                         "+ SIN(RADIANS(p.latpoint)) " +
+                                         "* SIN(RADIANS(z.latitude)))) AS distance_in_km " +
+                                "FROM Rooms AS z " +
+                                "JOIN ( " +
+                                    "SELECT " +  user.Latitude + " AS latpoint, " + user.Longitude + " AS longpoint, " +
+                                        "50.0 AS radius, 69.0 AS distance_unit " +
+                                ") AS p ON 1=1 " +
+                                "WHERE z.latitude " +
+                                    "BETWEEN p.latpoint  - (p.radius / p.distance_unit) " +
+                                        "AND p.latpoint  + (p.radius / p.distance_unit) " +
+                                "AND z.longitude " +
+                                    "BETWEEN p.longpoint - (p.radius / (p.distance_unit * COS(RADIANS(p.latpoint)))) " +
+                                        "AND p.longpoint + (p.radius / (p.distance_unit * COS(RADIANS(p.latpoint)))) " +
+                                "ORDER BY distance_in_km";
+
+                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                if (reader.Read())
+                {
+                    if (reader.GetInt32(0) > 0)
+                    {
+                        bm.Status.Code = StatusCode.OK;
+                        bm.Status.Description = DataUtils.OK;
+                    }
+                    else
+                    {
+                        bm.Status.Code = StatusCode.NotFound;
+                        bm.Status.Description = "Room not found";
+                    }
+                }
+                connection.Close();
+            }
+
+            return response;
+        }
+
     }
 }

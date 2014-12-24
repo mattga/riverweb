@@ -12,7 +12,7 @@ namespace RiverWeb.Models
         OK = 0,
         NotFound,
         AlreadyExists,
-        Error
+        Error = 9
     }
 
     public class BaseModel
