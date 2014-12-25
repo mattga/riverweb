@@ -12,7 +12,8 @@ namespace RiverWeb.Controllers
 {
     public class RoomController : ApiController
     {
-        public IEnumerable<Room> Get()
+        [ActionName("DefaultAction")]
+        public IEnumerable<Room> Get(string latitude="", string longitude="")
         {
             List<Room> rs = new List<Room>();
 
@@ -20,7 +21,32 @@ namespace RiverWeb.Controllers
 
             if (connection != null)
             {
-                string query = "CALL GetAllRooms()";
+                string query = "SELECT *";
+                if (latitude != "" && longitude != "")
+                {
+                    query += ",p.distance_unit " +
+                                    "* DEGREES(ACOS(COS(RADIANS(p.latpoint)) " +
+                                    "* COS(RADIANS(z.latitude)) " +
+                                    "* COS(RADIANS(p.longpoint) - RADIANS(z.longitude)) " +
+                                    "+ SIN(RADIANS(p.latpoint)) " +
+                                    "* SIN(RADIANS(z.latitude)))) AS distance_in_km " +
+                                "FROM Rooms AS z " +
+                                "JOIN ( " +
+                                    "SELECT " + latitude + " AS latpoint, " + longitude + " AS longpoint, " +
+                                        "50.0 AS radius, 69.0 AS distance_unit " +
+                                ") AS p ON 1=1 " +
+                                "WHERE z.latitude " +
+                                    "BETWEEN p.latpoint  - (p.radius / p.distance_unit) " +
+                                        "AND p.latpoint  + (p.radius / p.distance_unit) " +
+                                "AND z.longitude " +
+                                    "BETWEEN p.longpoint - (p.radius / (p.distance_unit * COS(RADIANS(p.latpoint)))) " +
+                                        "AND p.longpoint + (p.radius / (p.distance_unit * COS(RADIANS(p.latpoint)))) " +
+                                "ORDER BY distance_in_km";
+                }
+                else
+                {
+                    query += " FROM Rooms";
+                }
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
                 while (reader.Read())
