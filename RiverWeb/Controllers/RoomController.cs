@@ -52,7 +52,9 @@ namespace RiverWeb.Controllers
                 while (reader.Read())
                 {
                     Room r = new Room();
-                    r.RoomName = reader.GetString(0);
+                    r.RoomId = DataUtils.getInt32(reader, "RoomId");
+                    r.RoomName = DataUtils.getString(reader, "RoomName");
+                    r.isPrivate = DataUtils.getInt32(reader, "isPrivate");
                     r.Status.Code = StatusCode.OK;
                     r.Status.Description = DataUtils.OK;
 

@@ -12,7 +12,6 @@ namespace RiverWeb.Models
     [Table("Rooms")]
     public class Room : BaseModel
     {
-        [JsonIgnore]
         public int RoomId { get; set; }
         public int HostId { get; set; }
         public string RoomName { get; set; }
