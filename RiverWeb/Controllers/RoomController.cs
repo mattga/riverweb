@@ -21,7 +21,7 @@ namespace RiverWeb.Controllers
 
             if (connection != null)
             {
-                string query = "SELECT *";
+                string query = "SELECT z.*,COUNT(rs.SongId) AS SongCount,COUNT(ru.UserId)+1 AS UserCount";
                 if (latitude != "" && longitude != "")
                 {
                     query += ",p.distance_unit " +
@@ -30,7 +30,8 @@ namespace RiverWeb.Controllers
                                     "* COS(RADIANS(p.longpoint) - RADIANS(z.longitude)) " +
                                     "+ SIN(RADIANS(p.latpoint)) " +
                                     "* SIN(RADIANS(z.latitude)))) AS distance_in_km " +
-                                "FROM Rooms AS z " +
+                                "FROM Rooms AS z LEFT OUTER JOIN RoomSongs AS rs ON z.RoomId=rs.RoomId " +
+                                    "LEFT OUTER JOIN RoomUsers AS ru ON z.RoomId=ru.RoomId " +
                                 "JOIN ( " +
                                     "SELECT " + latitude + " AS latpoint, " + longitude + " AS longpoint, " +
                                         "50.0 AS radius, 69.0 AS distance_unit " +
@@ -41,11 +42,13 @@ namespace RiverWeb.Controllers
                                 "AND z.longitude " +
                                     "BETWEEN p.longpoint - (p.radius / (p.distance_unit * COS(RADIANS(p.latpoint)))) " +
                                         "AND p.longpoint + (p.radius / (p.distance_unit * COS(RADIANS(p.latpoint)))) " +
-                                "ORDER BY distance_in_km";
+                                "GROUP BY z.RoomId ORDER BY distance_in_km";
                 }
                 else
                 {
-                    query += " FROM Rooms";
+                    query += " FROM Rooms AS z LEFT OUTER JOIN RoomSongs AS rs ON z.RoomId=rs.RoomId " +
+                                    "LEFT OUTER JOIN RoomUsers AS ru ON z.RoomId=ru.RoomId " +
+                                    "GROUP BY z.RoomId";
                 }
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
@@ -57,6 +60,8 @@ namespace RiverWeb.Controllers
                     //r.isPrivate = DataUtils.getInt32(reader, "isPrivate");
                     r.Latitude = DataUtils.getDouble(reader, "Latitude");
                     r.Longitude = DataUtils.getDouble(reader, "Longitude");
+                    r.SongCount = DataUtils.getInt32(reader, "SongCount");
+                    r.UserCount = DataUtils.getInt32(reader, "UserCount");
 
                     r.Status.Code = StatusCode.OK;
                     r.Status.Description = DataUtils.OK;

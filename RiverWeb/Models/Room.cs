@@ -20,6 +20,9 @@ namespace RiverWeb.Models
         public bool isPrivate { get; set; }
         public int AccessCode { get; set; }
 
+        public int SongCount { get; set; }
+        public int UserCount { get; set; }
+
         public virtual ICollection<Song> Songs { get; set; }
         public virtual ICollection<RoomUser> Users { get; set; }
     }
