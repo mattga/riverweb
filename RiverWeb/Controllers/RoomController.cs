@@ -62,7 +62,7 @@ namespace RiverWeb.Controllers
                     r.Longitude = DataUtils.getDouble(reader, "Longitude");
                     r.SongCount = DataUtils.getInt32(reader, "SongCount");
                     r.UserCount = DataUtils.getInt32(reader, "UserCount");
-
+                    
                     r.Status.Code = StatusCode.OK;
                     r.Status.Description = DataUtils.OK;
 

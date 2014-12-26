@@ -155,6 +155,7 @@ namespace RiverWeb.Controllers
                 if (reader.Read())
                 {
                     u.UserId = DataUtils.getInt32(reader, "UserId");
+                    u.Username = DataUtils.getString(reader, "Username");
                     u.Email = DataUtils.getString(reader, "Email");
 
                     u.Status.Code = StatusCode.AlreadyExists;
@@ -191,7 +192,14 @@ namespace RiverWeb.Controllers
                     reader.Close();
                     reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
+                    query = "SELECT * FROM Users " +
+                        "WHERE UserId=" + id;
+                    reader.Close();
+                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
                     u.UserId = Convert.ToInt32(id);
+                    u.Username = DataUtils.getString(reader, "Username");
+                    u.Email = DataUtils.getString(reader, "Email");
 
                     u.Status.Code = StatusCode.OK;
                     u.Status.Description = "Spotify information linked to account.";
