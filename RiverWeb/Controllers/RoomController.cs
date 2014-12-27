@@ -58,6 +58,7 @@ namespace RiverWeb.Controllers
                     r.RoomId = DataUtils.getInt32(reader, "RoomId");
                     r.RoomName = DataUtils.getString(reader, "RoomName");
                     r.isPrivate = DataUtils.getBool(reader, "isPrivate");
+                    r.AccessCode = DataUtils.getInt32(reader, "AccessCode");
                     r.Latitude = DataUtils.getDouble(reader, "Latitude");
                     r.Longitude = DataUtils.getDouble(reader, "Longitude");
                     r.SongCount = DataUtils.getInt32(reader, "SongCount");
