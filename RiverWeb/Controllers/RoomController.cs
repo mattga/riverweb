@@ -57,7 +57,7 @@ namespace RiverWeb.Controllers
                     Room r = new Room();
                     r.RoomId = DataUtils.getInt32(reader, "RoomId");
                     r.RoomName = DataUtils.getString(reader, "RoomName");
-                    //r.isPrivate = DataUtils.getInt32(reader, "isPrivate");
+                    r.isPrivate = DataUtils.getBool(reader, "isPrivate");
                     r.Latitude = DataUtils.getDouble(reader, "Latitude");
                     r.Longitude = DataUtils.getDouble(reader, "Longitude");
                     r.SongCount = DataUtils.getInt32(reader, "SongCount");
@@ -86,53 +86,6 @@ namespace RiverWeb.Controllers
                 string query = "CALL GetRoomFromName(\"" + id + "\")";
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
-                if (reader.Read())
-                {
-                    r.RoomId = reader.GetInt32(0);
-                    r.RoomName = reader.GetString(2);
-                    r.Songs = new List<Song>();
-                    r.Users = new List<RoomUser>();
-                    
-                    if (reader.NextResult())
-                    {
-                        Song s;
-                        
-                        while (reader.Read())
-                        {
-                            s = new Song();
-                            s.ProviderId = reader.GetString(2);
-                            s.SongName = reader.GetString(3);
-                            s.SongArtist = reader.GetString(4);
-                            s.SongAlbum = reader.GetString(5);
-                            s.SongLength = reader.GetInt32(6);
-                            s.SongYear = reader.GetInt32(7);
-                            s.Tokens = reader.GetInt32(8);
-                            s.IsPlaying = reader.GetInt32(9);
-                            s.AlbumArtURL = reader.GetString(10);
-
-                            r.Songs.Add(s);
-                        }
-
-                        if (reader.NextResult())
-                        {
-                            RoomUser ru;
-
-                            while (reader.Read())
-                            {
-                                ru = new RoomUser();
-                                ru.User = new User();
-                                ru.User.UserId = reader.GetInt32(0);
-                                ru.User.Username = reader.GetString(1);
-                                ru.Tokens = reader.GetInt32(2);
-                                
-                                r.Users.Add(ru);
-                            }
-
-                            r.Status.Code = StatusCode.OK;
-                            r.Status.Description = DataUtils.OK;
-                        }
-                    }
-                }
                 connection.Close();
             }
 
@@ -225,36 +178,56 @@ namespace RiverWeb.Controllers
         }
 
         [System.Web.Http.HttpPost]
-        public HttpResponseMessage JoinRoom(string id, User user)
+        public Room JoinRoom(string id, User user)
         {
-            BaseModel bm = new BaseModel();
-            bm.Status.Code = StatusCode.Error;
-            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, bm);
+            Room r = new Room();
+            r.RoomId = Convert.ToInt32(id);
+            r.Status.Code = StatusCode.Error;
 
-            MySqlConnection connection = DataUtils.getConnection();
-
-            if (connection != null && user != null && user.Username != "")
+            try
             {
-                string query = "CALL JoinRoomWithUsername(\"" + user.Username + "\",\"" + id + "\")";
-                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                MySqlConnection connection = DataUtils.getConnection();
 
-                if (reader.Read())
+                if (connection != null && user != null && user.Username != "")
                 {
-                    if (reader.GetInt32(0) > 0)
+                    string query = "SELECT * FROM RoomUsers WHERE RoomId=" + id + " AND UserId=" + user.UserId;
+                    MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                    if (!reader.Read())
                     {
-                        bm.Status.Code = StatusCode.OK;
-                        bm.Status.Description = DataUtils.OK;
+                        query = "INSERT INTO RoomUsers VALUES (" + id + "," + user.UserId + ",100)";
+                        reader.Close();
+                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                        if (reader.RecordsAffected > 0)
+                        {
+                            r.Status.Code = StatusCode.OK;
+                            r.Status.Description = DataUtils.OK;
+                        }
+                        else
+                        {
+                            r.Status.Code = StatusCode.NotFound;
+                            r.Status.Description = "User/Room not found";
+                        }
                     }
                     else
                     {
-                        bm.Status.Code = StatusCode.NotFound;
-                        bm.Status.Description = "Room not found";
+                        r.Status.Code = StatusCode.AlreadyExists;
+                        r.Status.Description = "User already in room " + id;
                     }
+
+                    reader.Close();
+                    r.ReadRoom(connection);
+
+                    connection.Close();
                 }
-                connection.Close();
+            }
+            catch (Exception ex)
+            {
+                r.Status.Description = ex.StackTrace;
             }
 
-            return response;
+            return r;
         }
 
         [System.Web.Http.HttpPost]

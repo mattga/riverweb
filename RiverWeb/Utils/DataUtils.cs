@@ -161,6 +161,17 @@ namespace RiverWeb.Utils
             return reader.GetInt32(index);
         }
 
+        static public bool getBool(IDataReader reader, string column)
+        {
+            int index = reader.GetOrdinal(column);
+            if (reader.IsDBNull(index))
+            {
+                return false;
+            }
+
+            return reader.GetBoolean(index);
+        }
+
         static public double getDouble(IDataReader reader, string column)
         {
             int index = reader.GetOrdinal(column);
@@ -172,7 +183,7 @@ namespace RiverWeb.Utils
             return reader.GetDouble(index);
         }
 
-        static DateTime? getDateTime(IDataReader reader, string column)
+        static public DateTime? getDateTime(IDataReader reader, string column)
         {
             int index = reader.GetOrdinal(column);
             if (reader.IsDBNull(index))
