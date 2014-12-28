@@ -162,7 +162,7 @@ namespace RiverWeb.Controllers
                     {
                         r.RoomId = reader.GetInt32(0);
 
-                        query = "INSERT INTO RoomUsers (" + r.RoomId + "," + room.HostId + ",100)";
+                        query = "INSERT INTO RoomUsers VALUES (" + r.RoomId + "," + room.HostId + ",100)";
                         reader.Close();
                         reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
 
