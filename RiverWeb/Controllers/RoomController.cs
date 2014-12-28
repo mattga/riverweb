@@ -161,10 +161,17 @@ namespace RiverWeb.Controllers
                     if (reader.Read())
                     {
                         r.RoomId = reader.GetInt32(0);
-                    }
 
-                    r.Status.Code = StatusCode.OK;
-                    r.Status.Description = DataUtils.OK;
+                        query = "INSERT INTO RoomUsers (" + r.RoomId + "," + room.HostId + ",100)";
+                        reader.Close();
+                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                        if (reader.RecordsAffected > 0)
+                        {
+                            r.Status.Code = StatusCode.OK;
+                            r.Status.Description = "Room created successfully";
+                        }
+                    }
                 }
                 else
                 {
