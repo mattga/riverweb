@@ -21,7 +21,7 @@ namespace RiverWeb.Controllers
 
             if (connection != null)
             {
-                string query = "SELECT z.*,COUNT(rs.SongId) AS SongCount,COUNT(ru.UserId)+1 AS UserCount";
+                string query = "SELECT z.*,COUNT(rs.SongId) AS SongCount,COUNT(ru.UserId) AS UserCount";
                 if (latitude != "" && longitude != "")
                 {
                     query += ",p.distance_unit " +
