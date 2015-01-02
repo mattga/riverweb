@@ -94,44 +94,97 @@ namespace RiverWeb.Controllers
         }
 
         [System.Web.Http.HttpPost]
-        public HttpResponseMessage AddSong(string id, Room room)
+        public Song AddSong(string id, Song song)
         {
-            BaseModel status = new BaseModel();
-            status.Status.Code = StatusCode.Error;
-            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, status);
+            Song s = new Song();
+            s.Status.Code = StatusCode.Error;
             MySqlConnection connection = DataUtils.getConnection();
 
             if (connection != null)
             {
-                string query = "CALL AddSongToRoom(\"" + room.RoomName + "\",\""
-                                                        + room.Users.ToArray()[0].User.Username + "\",\""
-                                                        + room.Songs.ToArray()[0].ProviderId + "\",\""
-                                                        + room.Songs.ToArray()[0].SongName + "\",\""
-                                                        + room.Songs.ToArray()[0].SongArtist + "\",\""
-                                                        + room.Songs.ToArray()[0].SongAlbum + "\",\""
-                                                        + room.Songs.ToArray()[0].SongLength + "\",\""
-                                                        + room.Songs.ToArray()[0].SongYear + "\",\""
-                                                        + room.Songs.ToArray()[0].AlbumArtURL + "\",\""
-                                                        + room.Songs.ToArray()[0].Tokens + "\")";
+                string query = "SELECT * FROM RoomSongs WHERE SourceId='" + song.SourceId + "' AND RoomId=" + id;
                 MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                if (reader.Read()) {
 
-                if (reader.Read())
-                {
-                    if (reader.GetInt32(0) > 0)
+                    s.SongId = DataUtils.getInt32(reader, "SongId");
+                    s.RoomId = DataUtils.getInt32(reader, "RoomId");
+                    s.SourceId = DataUtils.getString(reader, "SourceId");
+                    s.Title = DataUtils.getString(reader, "Title");
+                    s.Artist = DataUtils.getString(reader, "Artist");
+                    s.Album = DataUtils.getString(reader, "Album");
+                    s.Thumbnail = DataUtils.getString(reader, "Thumbnail");
+                    s.Length = DataUtils.getInt32(reader, "Length");
+                    s.PublishedDate = DataUtils.getDateTime(reader, "PublishedDate");
+                    s.Tokens = DataUtils.getInt32(reader, "Tokens") + song.Tokens;
+                    s.IsPlaying = DataUtils.getBool(reader, "IsPlaying");
+                    s.CreatedDate = DataUtils.getDateTime(reader, "CreatedDate");
+                    s.Source = DataUtils.getString(reader, "Source");
+
+                    query = "UPDATE RoomSongs SET Tokens=Tokens+" + song.Tokens + " WHERE SongId=" + s.SongId;
+                    reader.Close();
+                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                    if (reader.RecordsAffected > 0)
                     {
-                        status.Status.Code = StatusCode.OK;
-                        status.Status.Description = DataUtils.OK;
+                        s.Status.Code = StatusCode.AlreadyExists;
+                        s.Status.Description = "Song already exists in this Room. Points added.";
+                    }
+                } else {
+                    query = "INSERT INTO RoomSongs (RoomId,SourceId,Title,Artist,Album,Length,PublishedDate,Source,Thumbnail,Tokens,IsPlaying) VALUES (";
+                    query += id + ",'" + song.SourceId + "','" + song.Title + "','" + song.Artist + "',";
+                    if (song.Album != null)
+                    {
+                        query += "'" + song.Album + "',";
                     }
                     else
                     {
-                        status.Status.Code = StatusCode.AlreadyExists;
-                        status.Status.Description = "Points added to existing song";
+                        query += "NULL,";
+                    }
+                    query += song.Length + ",'" + song.PublishedDate + "','" + song.Source + "',";
+                    if (song.Thumbnail != null)
+                    {
+                        query += "'" + song.Thumbnail + "',";
+                    }
+                    else
+                    {
+                        query += "NULL,";
+                    }
+                    query += song.Tokens + "," + song.IsPlaying + ")";
+
+                    reader.Close();
+                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                    if (reader.RecordsAffected > 0)
+                    {
+                        query = "SELECT * FROM RoomSongs, Rooms WHERE Rooms.RoomId=RoomSongs.RoomId AND SongId=LAST_INSERT_ID()";
+                        reader.Close();
+                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+
+                        if (reader.Read())
+                        {
+                            s.SongId = DataUtils.getInt32(reader, "SongId");
+                            s.RoomId = DataUtils.getInt32(reader, "RoomId");
+                            s.SourceId = DataUtils.getString(reader, "SourceId");
+                            s.Title = DataUtils.getString(reader, "Title");
+                            s.Artist = DataUtils.getString(reader, "Artist");
+                            s.Album = DataUtils.getString(reader, "Album");
+                            s.Thumbnail = DataUtils.getString(reader, "Thumbnail");
+                            s.Length = DataUtils.getInt32(reader, "Length");
+                            s.PublishedDate = DataUtils.getDateTime(reader, "PublishedDate");
+                            s.Tokens = DataUtils.getInt32(reader, "Tokens") + song.Tokens;
+                            s.IsPlaying = DataUtils.getBool(reader, "IsPlaying");
+                            s.CreatedDate = DataUtils.getDateTime(reader, "CreatedDate");
+                            s.Source = DataUtils.getString(reader, "Source");
+
+                            s.Status.Code = StatusCode.OK;
+                            s.Status.Description = DataUtils.OK;
+                        }
                     }
                 }
                 connection.Close();
             }
 
-            return response;
+            return s;
         }
         
         [ActionName("DefaultAction")]
