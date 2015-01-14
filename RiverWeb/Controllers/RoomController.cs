@@ -81,6 +81,7 @@ namespace RiverWeb.Controllers
             Room r = new Room();
             r.RoomId = Convert.ToInt32(id);
             r.Status.Code = StatusCode.NotFound;
+            r.Status.Description = "Room not found.";
 
             MySqlConnection connection = DataUtils.getConnection();
 
@@ -89,6 +90,7 @@ namespace RiverWeb.Controllers
                 if (r.ReadRoom(connection))
                 {
                     r.Status.Code = StatusCode.OK;
+                    r.Status.Description = DataUtils.OK;
                 }
 
                 connection.Close();
@@ -143,7 +145,7 @@ namespace RiverWeb.Controllers
                     {
                         query += "NULL,";
                     }
-                    query += song.Length + ",'" + song.PublishedDate + "','" + song.Source + "',";
+                    query += song.Length + ",'" + song.PublishedDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + song.Source + "',";
                     if (song.Thumbnail != null)
                     {
                         query += "'" + song.Thumbnail + "',";

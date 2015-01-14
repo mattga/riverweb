@@ -24,9 +24,9 @@ namespace RiverWeb.Models
         public string Album { get; set; }
         public string Thumbnail { get; set; }
         public int Length { get; set; }
-        public DateTime? PublishedDate { get; set; }
+        public DateTime PublishedDate { get; set; }
         public int Tokens { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
         public string Source { get; set; }
 
         [JsonIgnore]

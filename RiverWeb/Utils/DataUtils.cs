@@ -183,12 +183,12 @@ namespace RiverWeb.Utils
             return reader.GetDouble(index);
         }
 
-        static public DateTime? getDateTime(IDataReader reader, string column)
+        static public DateTime getDateTime(IDataReader reader, string column)
         {
             int index = reader.GetOrdinal(column);
             if (reader.IsDBNull(index))
             {
-                return null;
+                return DateTime.Now;
             }
 
             return reader.GetDateTime(index);
