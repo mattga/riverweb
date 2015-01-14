@@ -26,7 +26,6 @@ namespace RiverWeb.Models
         public int Length { get; set; }
         public DateTime? PublishedDate { get; set; }
         public int Tokens { get; set; }
-        public bool IsPlaying { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string Source { get; set; }
 
@@ -52,7 +51,6 @@ namespace RiverWeb.Models
                     this.Length = DataUtils.getInt32(reader, "Length");
                     this.PublishedDate = DataUtils.getDateTime(reader, "PublishedDate");
                     this.Tokens = DataUtils.getInt32(reader, "Tokens");
-                    this.IsPlaying = DataUtils.getBool(reader, "IsPlaying");
                     this.Source = DataUtils.getString(reader, "Source");
                     this.CreatedDate = DataUtils.getDateTime(reader, "CreatedDate");
 

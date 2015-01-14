@@ -116,7 +116,6 @@ namespace RiverWeb.Controllers
                     s.Length = DataUtils.getInt32(reader, "Length");
                     s.PublishedDate = DataUtils.getDateTime(reader, "PublishedDate");
                     s.Tokens = DataUtils.getInt32(reader, "Tokens") + song.Tokens;
-                    s.IsPlaying = DataUtils.getBool(reader, "IsPlaying");
                     s.CreatedDate = DataUtils.getDateTime(reader, "CreatedDate");
                     s.Source = DataUtils.getString(reader, "Source");
 
@@ -130,7 +129,7 @@ namespace RiverWeb.Controllers
                         s.Status.Description = "Song already exists in this Room. Points added.";
                     }
                 } else {
-                    query = "INSERT INTO RoomSongs (RoomId,SourceId,Title,Artist,Album,Length,PublishedDate,Source,Thumbnail,Tokens,IsPlaying) VALUES (";
+                    query = "INSERT INTO RoomSongs (RoomId,SourceId,Title,Artist,Album,Length,PublishedDate,Source,Thumbnail,Tokens) VALUES (";
                     query += id + ",'" + song.SourceId + "','" + song.Title + "','" + song.Artist + "',";
                     if (song.Album != null)
                     {
@@ -149,7 +148,7 @@ namespace RiverWeb.Controllers
                     {
                         query += "NULL,";
                     }
-                    query += song.Tokens + "," + song.IsPlaying + ")";
+                    query += song.Tokens + ")";
 
                     reader.Close();
                     reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
@@ -172,7 +171,6 @@ namespace RiverWeb.Controllers
                             s.Length = DataUtils.getInt32(reader, "Length");
                             s.PublishedDate = DataUtils.getDateTime(reader, "PublishedDate");
                             s.Tokens = DataUtils.getInt32(reader, "Tokens") + song.Tokens;
-                            s.IsPlaying = DataUtils.getBool(reader, "IsPlaying");
                             s.CreatedDate = DataUtils.getDateTime(reader, "CreatedDate");
                             s.Source = DataUtils.getString(reader, "Source");
 
