@@ -75,17 +75,21 @@ namespace RiverWeb.Controllers
             return rs;
         }
 
+        [ActionName("DefaultAction")]
         public Room Get(string id)
         {
             Room r = new Room();
+            r.RoomId = Convert.ToInt32(id);
             r.Status.Code = StatusCode.NotFound;
 
             MySqlConnection connection = DataUtils.getConnection();
 
             if (connection != null)
             {
-                string query = "CALL GetRoomFromName(\"" + id + "\")";
-                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                if (r.ReadRoom(connection))
+                {
+                    r.Status.Code = StatusCode.OK;
+                }
 
                 connection.Close();
             }
