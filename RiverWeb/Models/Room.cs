@@ -22,8 +22,15 @@ namespace RiverWeb.Models
         public double Longitude { get; set; }
         public bool isPrivate { get; set; }
         public int AccessCode { get; set; }
+        public bool AllowYT { get; set; }
+        public bool AllowSP { get; set; }
+        public int CurrentSong { get; set; }
+        public bool isPlaying { get; set; }
+        public int CurrentSongTime { get; set; }
 
+        [NotMapped]
         public int SongCount { get; set; }
+        [NotMapped]
         public int UserCount { get; set; }
 
         public virtual ICollection<Song> Songs { get; set; }
@@ -32,45 +39,50 @@ namespace RiverWeb.Models
         public bool ReadRoom(MySqlConnection connection)
         {
             string query = "SELECT * FROM Rooms WHERE RoomId = " + this.RoomId;
-            MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+            MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
             if (reader.Read())
             {
                 if (reader.HasRows)
                 {
-                    this.RoomId = DataUtils.getInt32(reader, "RoomId");
-                    this.RoomName = DataUtils.getString(reader, "RoomName");
-                    this.CreatedDate = DataUtils.getDateTime(reader, "CreatedDate");
-                    this.HostId = DataUtils.getInt32(reader, "HostId");
-                    this.Latitude = DataUtils.getDouble(reader, "Latitude");
-                    this.Longitude = DataUtils.getDouble(reader, "Longitude");
-                    this.isPrivate = DataUtils.getBool(reader, "IsPrivate");
-                    this.AccessCode = DataUtils.getInt32(reader, "AccessCode");
+                    this.RoomId = DataUtility.getInt32(reader, "RoomId");
+                    this.RoomName = DataUtility.getString(reader, "RoomName");
+                    this.CreatedDate = DataUtility.getDateTime(reader, "CreatedDate");
+                    this.HostId = DataUtility.getInt32(reader, "HostId");
+                    this.Latitude = DataUtility.getDouble(reader, "Latitude");
+                    this.Longitude = DataUtility.getDouble(reader, "Longitude");
+                    this.isPrivate = DataUtility.getBool(reader, "IsPrivate");
+                    this.AccessCode = DataUtility.getInt32(reader, "AccessCode");
+                    this.AllowSP = DataUtility.getBool(reader, "AllowSP");
+                    this.AllowYT = DataUtility.getBool(reader, "AllowYT");
+                    this.CurrentSong = DataUtility.getInt32(reader, "CurrentSong");
+                    this.isPlaying = DataUtility.getBool(reader, "IsPlaying");
+                    this.CurrentSongTime = DataUtility.getInt32(reader, "CurrentSongTime");
                     this.Users = new List<RoomUser>();
                     this.Songs = new List<Song>();
 
                     query = "SELECT * FROM RoomUsers WHERE RoomId = " + this.RoomId;
                     reader.Close();
-                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
                     while (reader.Read())
                     {
                         User u = new User();
-                        u.UserId = DataUtils.getInt32(reader, "UserId");
-                        u.ReadUser(DataUtils.getConnection());
+                        u.UserId = DataUtility.getInt32(reader, "UserId");
+                        u.ReadUser(DataUtility.getConnection());
                         RoomUser ru = new RoomUser();
                         ru.User = u;
-                        ru.Tokens = DataUtils.getInt32(reader, "Tokens");
+                        ru.Tokens = DataUtility.getInt32(reader, "Tokens");
                         this.Users.Add(ru);
                     }
 
                     query = "SELECT * FROM RoomSongs WHERE RoomId = " + this.RoomId;
                     reader.Close();
-                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
                     while (reader.Read())
                     {
                         Song s = new Song();
-                        s.SongId = DataUtils.getInt32(reader, "SongId");
-                        s.ReadSong(DataUtils.getConnection());
+                        s.SongId = DataUtility.getInt32(reader, "SongId");
+                        s.ReadSong(DataUtility.getConnection());
                         this.Songs.Add(s);
                     }
 

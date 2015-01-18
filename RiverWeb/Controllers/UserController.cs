@@ -20,7 +20,7 @@ namespace RiverWeb.Controllers
             User u = new User();
             u.Status.Code = StatusCode.Error;
 
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             if (connection != null && u != null && u.Username != "")
             {
@@ -29,14 +29,14 @@ namespace RiverWeb.Controllers
                 if (u.ReadUser(connection))
                 {
                     u.Status.Code = StatusCode.OK;
-                    u.Status.Description = DataUtils.OK;
+                    u.Status.Description = DataUtility.OK;
                 }
                 else
                 {
                     u.Status.Code = StatusCode.NotFound;
                     u.Status.Description = "Incorrect username or password";
                 }
-                DataUtils.closeConnection(connection);
+                DataUtility.closeConnection(connection);
             }
 
             return u;
@@ -49,31 +49,31 @@ namespace RiverWeb.Controllers
             User u = new User();
             u.Status.Code = StatusCode.Error;
 
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             try
             {
                 if (connection != null && user != null && user.Username != "")
                 {
                     string query = "SELECT * FROM Users WHERE Email=\"" + user.Email + "\" AND Password=\"" + user.Password + "\"";
-                    MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                     if (reader.Read())
                     {
                         if (reader.HasRows)
                         {
-                            u.UserId = DataUtils.getInt32(reader, "UserId");
-                            u.Username = DataUtils.getString(reader, "Username");
+                            u.UserId = DataUtility.getInt32(reader, "UserId");
+                            u.Username = DataUtility.getString(reader, "Username");
                             u.CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate"));
-                            u.Email = DataUtils.getString(reader, "Email");
-                            u.City = DataUtils.getString(reader, "City");
-                            u.State = DataUtils.getString(reader, "State");
-                            u.Country = DataUtils.getString(reader, "Country");
-                            u.ImageUrl = DataUtils.getString(reader, "ImageUrl");
-                            u.spUsername = DataUtils.getString(reader, "spUsername");
+                            u.Email = DataUtility.getString(reader, "Email");
+                            u.City = DataUtility.getString(reader, "City");
+                            u.State = DataUtility.getString(reader, "State");
+                            u.Country = DataUtility.getString(reader, "Country");
+                            u.ImageUrl = DataUtility.getString(reader, "ImageUrl");
+                            u.spUsername = DataUtility.getString(reader, "spUsername");
 
                             u.Status.Code = StatusCode.OK;
-                            u.Status.Description = DataUtils.OK;
+                            u.Status.Description = DataUtility.OK;
                         }
                     }
                     else
@@ -81,7 +81,7 @@ namespace RiverWeb.Controllers
                         u.Status.Code = StatusCode.NotFound;
                         u.Status.Description = "Incorrect username or password";
                     }
-                    DataUtils.closeConnection(connection);
+                    DataUtility.closeConnection(connection);
                 }
             }
             catch (Exception ex)
@@ -99,12 +99,12 @@ namespace RiverWeb.Controllers
             User u = new User();
             u.Status.Code = StatusCode.Error;
 
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             if (connection != null && user != null && user.Username != "")
             {
                 string query = "SELECT UserId FROM Users WHERE Email=\"" + user.Email + "\"";
-                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                 if (!reader.HasRows)
                 {
@@ -112,13 +112,13 @@ namespace RiverWeb.Controllers
                         "VALUES (\"" + user.Username + "\",\"" + user.Password + "\",\"" + user.Email + "\","
                             + (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ")";
                     reader.Close();
-                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                     if (reader.RecordsAffected > 0)
                     {
                         query = "SELECT LAST_INSERT_ID()";
                         reader.Close();
-                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                        reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                         if (reader.Read())
                         {
@@ -134,7 +134,7 @@ namespace RiverWeb.Controllers
                     u.Status.Code = StatusCode.AlreadyExists;
                     u.Status.Description = "User already exists.";
                 }
-                DataUtils.closeConnection(connection);
+                DataUtility.closeConnection(connection);
             }
 
             return u;
@@ -145,18 +145,18 @@ namespace RiverWeb.Controllers
         public User LinkSpotify(string id, User user) {
             User u = new User();
             u.Status.Code = StatusCode.Error;
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             if (connection != null &&user != null)
             {
                 string query = "SELECT * FROM Users WHERE spEmail='" + user.spEmail + "'";
-                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                 if (reader.Read())
                 {
-                    u.UserId = DataUtils.getInt32(reader, "UserId");
-                    u.Username = DataUtils.getString(reader, "Username");
-                    u.Email = DataUtils.getString(reader, "Email");
+                    u.UserId = DataUtility.getInt32(reader, "UserId");
+                    u.Username = DataUtility.getString(reader, "Username");
+                    u.Email = DataUtility.getString(reader, "Email");
 
                     u.Status.Code = StatusCode.AlreadyExists;
                     u.Status.Description = "Spotify account already linked to a user.";
@@ -166,13 +166,13 @@ namespace RiverWeb.Controllers
                     query = "INSERT INTO Users (spUsername, spCanonicalUsername, spEmail) VALUES ('" + user.spUsername +
                             "','" + user.spCanonicalUsername + "','" + user.spEmail + "')";
                     reader.Close();
-                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                     if (reader.RecordsAffected > 0)
                     {
                         query = "SELECT LAST_INSERT_ID()";
                         reader.Close();
-                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                        reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                         if (reader.Read())
                         {
@@ -190,22 +190,22 @@ namespace RiverWeb.Controllers
                         "', spEmail='" + user.spEmail + "'" + 
                         "WHERE UserId=" + id;
                     reader.Close();
-                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                     query = "SELECT * FROM Users " +
                         "WHERE UserId=" + id;
                     reader.Close();
-                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                     u.UserId = Convert.ToInt32(id);
-                    u.Username = DataUtils.getString(reader, "Username");
-                    u.Email = DataUtils.getString(reader, "Email");
+                    u.Username = DataUtility.getString(reader, "Username");
+                    u.Email = DataUtility.getString(reader, "Email");
 
                     u.Status.Code = StatusCode.OK;
                     u.Status.Description = "Spotify information linked to account.";
                 }
 
-                DataUtils.closeConnection(connection);
+                DataUtility.closeConnection(connection);
             }
 
             return u;
@@ -218,13 +218,13 @@ namespace RiverWeb.Controllers
             User u = new User();
             u.Status.Code = StatusCode.Error;
 
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             if (connection != null && user != null && user.Username != "")
             {
                 string query = "";
                 query = "SELECT UserId FROM Users WHERE Email=\"" + user.Email + "\"";
-                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                 if (reader.Read())
                 {
@@ -232,12 +232,12 @@ namespace RiverWeb.Controllers
                         "SET Password=\"" + user.Password + "\",Username=\"" + user.Username + "\",Email=\"" + user.Email +
                             "\",ImageUrl=\"" + user.ImageUrl + "\" " +
                         "WHERE Email = \"" + user.Email + "\" AND Password = \"" + user.Password + "\"";
-                    DataUtils.executeQuery(connection, query);
+                    DataUtility.executeQuery(connection, query);
                     
                     query = "SELECT UserId " +
                         "FROM Users " +
                         "WHERE Email = \"" + user.Email + "\" AND Password = \"" + user.Password + "\"";
-                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                     u.UserId = reader.GetInt32(0);
                     if (u.ReadUser(connection))
@@ -251,17 +251,17 @@ namespace RiverWeb.Controllers
                     query = " INSERT INTO Users (Username, Password, FirstName, LastName, ImageUrl) " +
                         "VALUES (\"" + user.Username + "\", \"" + user.Password + "\", \"" + user.Email + "\", " +
                         (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ")";
-                    DataUtils.executeQuery(connection, query);
+                    DataUtility.executeQuery(connection, query);
 
                     reader.Close();
-                    u.UserId = ((MySqlDataReader)DataUtils.executeQuery(connection, "SELECT LAST_INSERT_ID()")).GetInt32(0);
+                    u.UserId = ((MySqlDataReader)DataUtility.executeQuery(connection, "SELECT LAST_INSERT_ID()")).GetInt32(0);
                     if (u.ReadUser(connection))
                     {
                         u.Status.Code = StatusCode.OK;
                         u.Status.Description = "Success updating user.";
                     }
                 }
-                DataUtils.closeConnection(connection);
+                DataUtility.closeConnection(connection);
             }
 
             return u;

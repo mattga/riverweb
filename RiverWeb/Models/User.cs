@@ -33,21 +33,21 @@ namespace RiverWeb.Models
         public bool ReadUser(MySqlConnection connection)
         {
             string query = "SELECT * FROM Users WHERE Users.UserId = " + this.UserId;
-            MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+            MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
             if (reader.Read())
             {
                 if (reader.HasRows)
                 {
-                    this.UserId = DataUtils.getInt32(reader, "UserId");
-                    this.Username = DataUtils.getString(reader, "Username");
+                    this.UserId = DataUtility.getInt32(reader, "UserId");
+                    this.Username = DataUtility.getString(reader, "Username");
                     this.CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate"));
-                    this.Email = DataUtils.getString(reader, "Email");
-                    this.City = DataUtils.getString(reader, "City");
-                    this.State = DataUtils.getString(reader, "State");
-                    this.Country = DataUtils.getString(reader, "Country");
-                    this.ImageUrl = DataUtils.getString(reader, "ImageUrl");
-                    this.spUsername = DataUtils.getString(reader, "spUsername");
+                    this.Email = DataUtility.getString(reader, "Email");
+                    this.City = DataUtility.getString(reader, "City");
+                    this.State = DataUtility.getString(reader, "State");
+                    this.Country = DataUtility.getString(reader, "Country");
+                    this.ImageUrl = DataUtility.getString(reader, "ImageUrl");
+                    this.spUsername = DataUtility.getString(reader, "spUsername");
 
                     return true;
                 }

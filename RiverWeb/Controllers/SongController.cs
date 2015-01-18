@@ -21,17 +21,17 @@ namespace RiverWeb.Controllers
             BaseModel status = new BaseModel();
             HttpResponseMessage response = Request.CreateResponse<BaseModel>(HttpStatusCode.OK, status);
 
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             if (connection != null)
             {
-                string query = "CALL SetSongPlaying(\"" + room.RoomName + "\",\"spotify:track:" + id + "\")";
-                int affectedRows = DataUtils.executeNonQuery(connection, query);
+                string query = "UPDATE Rooms SET ";
+                int affectedRows = DataUtility.executeNonQuery(connection, query);
 
                 if (affectedRows > 0)
                 {
                     status.Status.Code = StatusCode.OK;
-                    status.Status.Description = DataUtils.OK;
+                    status.Status.Description = DataUtility.OK;
                 }
                 else
                 {
@@ -48,17 +48,17 @@ namespace RiverWeb.Controllers
         {
             BaseModel status = new BaseModel();
 
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             if (connection != null)
             {
                 string query = "CALL DeleteSongAndDistributeTokens(\"" + room.RoomName + "\",\"spotify:track:" + id + "\")";
-                int affectedRows = DataUtils.executeNonQuery(connection, query);
+                int affectedRows = DataUtility.executeNonQuery(connection, query);
 
                 if (affectedRows > 0)
                 {
                     status.Status.Code = StatusCode.OK;
-                    status.Status.Description = DataUtils.OK;
+                    status.Status.Description = DataUtility.OK;
                 }
                 else
                 {

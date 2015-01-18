@@ -35,24 +35,24 @@ namespace RiverWeb.Models
         public bool ReadSong(MySqlConnection connection)
         {
             string query = "SELECT * FROM RoomSongs WHERE SongId = " + this.SongId;
-            MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+            MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
             if (reader.Read())
             {
                 if (reader.HasRows)
                 {
-                    this.SongId = DataUtils.getInt32(reader, "SongId");
-                    this.RoomId = DataUtils.getInt32(reader, "RoomId");
-                    this.SourceId = DataUtils.getString(reader, "SourceId");
-                    this.Title = DataUtils.getString(reader, "Title");
-                    this.Artist = DataUtils.getString(reader, "Artist");
-                    this.Album = DataUtils.getString(reader, "Album");
-                    this.Thumbnail = DataUtils.getString(reader, "Thumbnail");
-                    this.Length = DataUtils.getInt32(reader, "Length");
-                    this.PublishedDate = DataUtils.getDateTime(reader, "PublishedDate");
-                    this.Tokens = DataUtils.getInt32(reader, "Tokens");
-                    this.Source = DataUtils.getString(reader, "Source");
-                    this.CreatedDate = DataUtils.getDateTime(reader, "CreatedDate");
+                    this.SongId = DataUtility.getInt32(reader, "SongId");
+                    this.RoomId = DataUtility.getInt32(reader, "RoomId");
+                    this.SourceId = DataUtility.getString(reader, "SourceId");
+                    this.Title = DataUtility.getString(reader, "Title");
+                    this.Artist = DataUtility.getString(reader, "Artist");
+                    this.Album = DataUtility.getString(reader, "Album");
+                    this.Thumbnail = DataUtility.getString(reader, "Thumbnail");
+                    this.Length = DataUtility.getInt32(reader, "Length");
+                    this.PublishedDate = DataUtility.getDateTime(reader, "PublishedDate");
+                    this.Tokens = DataUtility.getInt32(reader, "Tokens");
+                    this.Source = DataUtility.getString(reader, "Source");
+                    this.CreatedDate = DataUtility.getDateTime(reader, "CreatedDate");
 
                     return true;
                 }

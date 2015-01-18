@@ -17,7 +17,7 @@ namespace RiverWeb.Controllers
         {
             List<Room> rs = new List<Room>();
 
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             if (connection != null)
             {
@@ -50,22 +50,22 @@ namespace RiverWeb.Controllers
                                     "LEFT OUTER JOIN RoomUsers AS ru ON z.RoomId=ru.RoomId " +
                                     "GROUP BY z.RoomId";
                 }
-                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                 while (reader.Read())
                 {
                     Room r = new Room();
-                    r.RoomId = DataUtils.getInt32(reader, "RoomId");
-                    r.RoomName = DataUtils.getString(reader, "RoomName");
-                    r.isPrivate = DataUtils.getBool(reader, "isPrivate");
-                    r.AccessCode = DataUtils.getInt32(reader, "AccessCode");
-                    r.Latitude = DataUtils.getDouble(reader, "Latitude");
-                    r.Longitude = DataUtils.getDouble(reader, "Longitude");
-                    r.SongCount = DataUtils.getInt32(reader, "SongCount");
-                    r.UserCount = DataUtils.getInt32(reader, "UserCount");
+                    r.RoomId = DataUtility.getInt32(reader, "RoomId");
+                    r.RoomName = DataUtility.getString(reader, "RoomName");
+                    r.isPrivate = DataUtility.getBool(reader, "isPrivate");
+                    r.AccessCode = DataUtility.getInt32(reader, "AccessCode");
+                    r.Latitude = DataUtility.getDouble(reader, "Latitude");
+                    r.Longitude = DataUtility.getDouble(reader, "Longitude");
+                    r.SongCount = DataUtility.getInt32(reader, "SongCount");
+                    r.UserCount = DataUtility.getInt32(reader, "UserCount");
                     
                     r.Status.Code = StatusCode.OK;
-                    r.Status.Description = DataUtils.OK;
+                    r.Status.Description = DataUtility.OK;
 
                     rs.Add(r);
                 }
@@ -83,14 +83,14 @@ namespace RiverWeb.Controllers
             r.Status.Code = StatusCode.NotFound;
             r.Status.Description = "Room not found.";
 
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             if (connection != null)
             {
                 if (r.ReadRoom(connection))
                 {
                     r.Status.Code = StatusCode.OK;
-                    r.Status.Description = DataUtils.OK;
+                    r.Status.Description = DataUtility.OK;
                 }
 
                 connection.Close();
@@ -104,30 +104,30 @@ namespace RiverWeb.Controllers
         {
             Song s = new Song();
             s.Status.Code = StatusCode.Error;
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             if (connection != null)
             {
                 string query = "SELECT * FROM RoomSongs WHERE SourceId='" + song.SourceId + "' AND RoomId=" + id;
-                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
                 if (reader.Read()) {
 
-                    s.SongId = DataUtils.getInt32(reader, "SongId");
-                    s.RoomId = DataUtils.getInt32(reader, "RoomId");
-                    s.SourceId = DataUtils.getString(reader, "SourceId");
-                    s.Title = DataUtils.getString(reader, "Title");
-                    s.Artist = DataUtils.getString(reader, "Artist");
-                    s.Album = DataUtils.getString(reader, "Album");
-                    s.Thumbnail = DataUtils.getString(reader, "Thumbnail");
-                    s.Length = DataUtils.getInt32(reader, "Length");
-                    s.PublishedDate = DataUtils.getDateTime(reader, "PublishedDate");
-                    s.Tokens = DataUtils.getInt32(reader, "Tokens") + song.Tokens;
-                    s.CreatedDate = DataUtils.getDateTime(reader, "CreatedDate");
-                    s.Source = DataUtils.getString(reader, "Source");
+                    s.SongId = DataUtility.getInt32(reader, "SongId");
+                    s.RoomId = DataUtility.getInt32(reader, "RoomId");
+                    s.SourceId = DataUtility.getString(reader, "SourceId");
+                    s.Title = DataUtility.getString(reader, "Title");
+                    s.Artist = DataUtility.getString(reader, "Artist");
+                    s.Album = DataUtility.getString(reader, "Album");
+                    s.Thumbnail = DataUtility.getString(reader, "Thumbnail");
+                    s.Length = DataUtility.getInt32(reader, "Length");
+                    s.PublishedDate = DataUtility.getDateTime(reader, "PublishedDate");
+                    s.Tokens = DataUtility.getInt32(reader, "Tokens") + song.Tokens;
+                    s.CreatedDate = DataUtility.getDateTime(reader, "CreatedDate");
+                    s.Source = DataUtility.getString(reader, "Source");
 
                     query = "UPDATE RoomSongs SET Tokens=Tokens+" + song.Tokens + " WHERE SongId=" + s.SongId;
                     reader.Close();
-                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                     if (reader.RecordsAffected > 0)
                     {
@@ -157,31 +157,31 @@ namespace RiverWeb.Controllers
                     query += song.Tokens + ")";
 
                     reader.Close();
-                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                     if (reader.RecordsAffected > 0)
                     {
                         query = "SELECT * FROM RoomSongs, Rooms WHERE Rooms.RoomId=RoomSongs.RoomId AND SongId=LAST_INSERT_ID()";
                         reader.Close();
-                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                        reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                         if (reader.Read())
                         {
-                            s.SongId = DataUtils.getInt32(reader, "SongId");
-                            s.RoomId = DataUtils.getInt32(reader, "RoomId");
-                            s.SourceId = DataUtils.getString(reader, "SourceId");
-                            s.Title = DataUtils.getString(reader, "Title");
-                            s.Artist = DataUtils.getString(reader, "Artist");
-                            s.Album = DataUtils.getString(reader, "Album");
-                            s.Thumbnail = DataUtils.getString(reader, "Thumbnail");
-                            s.Length = DataUtils.getInt32(reader, "Length");
-                            s.PublishedDate = DataUtils.getDateTime(reader, "PublishedDate");
-                            s.Tokens = DataUtils.getInt32(reader, "Tokens") + song.Tokens;
-                            s.CreatedDate = DataUtils.getDateTime(reader, "CreatedDate");
-                            s.Source = DataUtils.getString(reader, "Source");
+                            s.SongId = DataUtility.getInt32(reader, "SongId");
+                            s.RoomId = DataUtility.getInt32(reader, "RoomId");
+                            s.SourceId = DataUtility.getString(reader, "SourceId");
+                            s.Title = DataUtility.getString(reader, "Title");
+                            s.Artist = DataUtility.getString(reader, "Artist");
+                            s.Album = DataUtility.getString(reader, "Album");
+                            s.Thumbnail = DataUtility.getString(reader, "Thumbnail");
+                            s.Length = DataUtility.getInt32(reader, "Length");
+                            s.PublishedDate = DataUtility.getDateTime(reader, "PublishedDate");
+                            s.Tokens = DataUtility.getInt32(reader, "Tokens") + song.Tokens;
+                            s.CreatedDate = DataUtility.getDateTime(reader, "CreatedDate");
+                            s.Source = DataUtility.getString(reader, "Source");
 
                             s.Status.Code = StatusCode.OK;
-                            s.Status.Description = DataUtils.OK;
+                            s.Status.Description = DataUtility.OK;
                         }
                     }
                 }
@@ -197,7 +197,7 @@ namespace RiverWeb.Controllers
             Room r = new Room();
             r.Status.Code = StatusCode.Error;
 
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             if (connection != null && room != null && room.RoomName != "")
             {
@@ -206,7 +206,7 @@ namespace RiverWeb.Controllers
                                 "(HostId,RoomName,isPrivate" + (room.isPrivate ? ",AccessCode," : ",") + "Latitude,Longitude) " +
                                 "VALUES (" + room.HostId + ",'" + room.RoomName + "'," + room.isPrivate +
                                 (room.isPrivate ? ","+room.AccessCode : "" ) + "," + room.Latitude + "," + room.Longitude + ")";
-                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                 if (reader.RecordsAffected > -1)
                 {
@@ -214,14 +214,14 @@ namespace RiverWeb.Controllers
 
                     query = "SELECT LAST_INSERT_ID()";
                     reader.Close();
-                    reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
                     if (reader.Read())
                     {
                         r.RoomId = reader.GetInt32(0);
 
                         query = "INSERT INTO RoomUsers VALUES (" + r.RoomId + "," + room.HostId + ",100)";
                         reader.Close();
-                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                        reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                         if (reader.RecordsAffected > 0)
                         {
@@ -251,23 +251,23 @@ namespace RiverWeb.Controllers
 
             try
             {
-                MySqlConnection connection = DataUtils.getConnection();
+                MySqlConnection connection = DataUtility.getConnection();
 
                 if (connection != null && user != null && user.Username != "")
                 {
                     string query = "SELECT * FROM RoomUsers WHERE RoomId=" + id + " AND UserId=" + user.UserId;
-                    MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                    MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                     if (!reader.Read())
                     {
                         query = "INSERT INTO RoomUsers VALUES (" + id + "," + user.UserId + ",100)";
                         reader.Close();
-                        reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                        reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                         if (reader.RecordsAffected > 0)
                         {
                             r.Status.Code = StatusCode.OK;
-                            r.Status.Description = DataUtils.OK;
+                            r.Status.Description = DataUtility.OK;
                         }
                         else
                         {
@@ -302,7 +302,7 @@ namespace RiverWeb.Controllers
             bm.Status.Code = StatusCode.Error;
             HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, bm);
 
-            MySqlConnection connection = DataUtils.getConnection();
+            MySqlConnection connection = DataUtility.getConnection();
 
             if (connection != null && user != null && user.Username != "")
             {
@@ -326,14 +326,14 @@ namespace RiverWeb.Controllers
                                         "AND p.longpoint + (p.radius / (p.distance_unit * COS(RADIANS(p.latpoint)))) " +
                                 "ORDER BY distance_in_km";
 
-                MySqlDataReader reader = (MySqlDataReader)DataUtils.executeQuery(connection, query);
+                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                 if (reader.Read())
                 {
                     if (reader.GetInt32(0) > 0)
                     {
                         bm.Status.Code = StatusCode.OK;
-                        bm.Status.Description = DataUtils.OK;
+                        bm.Status.Description = DataUtility.OK;
                     }
                     else
                     {
