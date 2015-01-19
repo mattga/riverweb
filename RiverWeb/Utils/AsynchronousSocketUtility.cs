@@ -62,6 +62,7 @@ namespace RiverWeb.Utils
                     // Start an asynchronous socket to listen for connections.
                     string message = "Waiting for a connection on " + localEndPoint + "...";
                     System.Diagnostics.Debug.WriteLine(message);
+                    Console.WriteLine(message);
 
                     MySqlConnection connection = DataUtility.getConnection();
                     DataUtility.executeQuery(connection, "INSERT INTO Log (Message) VALUES ('"+message+"')");
