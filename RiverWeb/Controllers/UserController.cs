@@ -161,7 +161,7 @@ namespace RiverWeb.Controllers
                     u.Status.Code = StatusCode.AlreadyExists;
                     u.Status.Description = "Spotify account already linked to a user.";
                 }
-                else if (id == "")
+                else if (id == "0" || id == "")
                 {
                     query = "INSERT INTO Users (spUsername, spCanonicalUsername, spEmail) VALUES ('" + user.spUsername +
                             "','" + user.spCanonicalUsername + "','" + user.spEmail + "')";
