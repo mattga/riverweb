@@ -426,3 +426,4 @@ C:\RiverWeb\RiverWeb\bin\zh-Hans\System.Spatial.resources.dll
 C:\RiverWeb\RiverWeb\bin\zh-Hant\System.Spatial.resources.dll
 C:\RiverWeb\RiverWeb\obj\Debug\RiverWeb.dll
 C:\RiverWeb\RiverWeb\obj\Debug\RiverWeb.pdb
+C:\RiverWeb\RiverWeb\obj\Debug\RiverWeb.csprojResolveAssemblyReference.cache

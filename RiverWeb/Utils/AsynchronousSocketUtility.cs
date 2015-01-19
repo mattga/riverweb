@@ -4,6 +4,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using RiverWeb.Utils;
+using MySql.Data.MySqlClient;
 
 namespace RiverWeb.Utils
 {
@@ -58,14 +60,24 @@ namespace RiverWeb.Utils
                     allDone.Reset();
 
                     // Start an asynchronous socket to listen for connections.
-                    System.Diagnostics.Debug.WriteLine("Waiting for a connection on " + localEndPoint + "...");
-                    Console.WriteLine("Waiting for a connection on " + localEndPoint + "...");
+                    string message = "Waiting for a connection on " + localEndPoint + "...";
+                    System.Diagnostics.Debug.WriteLine(message);
+
+                    MySqlConnection connection = DataUtility.getConnection();
+                    DataUtility.executeQuery(connection, "INSERT INTO Log (Message) VALUES ('"+message+"')");
+                    connection.Close();
+
                     listener.BeginAccept(
                         new AsyncCallback(AcceptCallback),
                         listener);
 
                     // Wait until a connection is made before continuing.
                     allDone.WaitOne();
+                    System.Diagnostics.Debug.WriteLine("Connection made on " + localEndPoint + "...");
+
+                    connection = DataUtility.getConnection();
+                    DataUtility.executeQuery(connection, "INSERT INTO Log (Message) VALUES ('Connection made on " + localEndPoint + "...')");
+                    connection.Close();
                 }
 
             }
@@ -78,6 +90,7 @@ namespace RiverWeb.Utils
 
         public static void AcceptCallback(IAsyncResult ar)
         {
+
             // Signal the main thread to continue.
             allDone.Set();
 
