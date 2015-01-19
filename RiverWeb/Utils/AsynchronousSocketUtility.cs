@@ -38,10 +38,11 @@ namespace RiverWeb.Utils
             byte[] bytes = new Byte[1024];
 
             // Establish the local endpoint for the socket.
-            IPHostEntry ipHostInfo = Dns.Resolve(Dns.GetHostName());
-            IPHostEntry localHostInfo = Dns.GetHostByName("localhost");
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
-            //IPAddress ipAddress = localHostInfo.AddressList[0];
+            //IPHostEntry ipHostInfo = Dns.Resolve(Dns.GetHostName());
+            //IPAddress ipAddress = ipHostInfo.AddressList[0];
+            IPHostEntry info = Dns.GetHostByName("riverweb.apphb.com");
+            IPAddress ipAddress = info.AddressList[0];
+            //IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 20891);
 
             // Create a TCP/IP socket.
