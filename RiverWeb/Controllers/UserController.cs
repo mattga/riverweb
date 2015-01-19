@@ -22,21 +22,28 @@ namespace RiverWeb.Controllers
 
             MySqlConnection connection = DataUtility.getConnection();
 
-            if (connection != null && u != null && u.Username != "")
+            try
             {
-                u.UserId = id;
+                if (connection != null && u != null && u.Username != "")
+                {
+                    u.UserId = id;
 
-                if (u.ReadUser(connection))
-                {
-                    u.Status.Code = StatusCode.OK;
-                    u.Status.Description = DataUtility.OK;
+                    if (u.ReadUser(connection))
+                    {
+                        u.Status.Code = StatusCode.OK;
+                        u.Status.Description = DataUtility.OK;
+                    }
+                    else
+                    {
+                        u.Status.Code = StatusCode.NotFound;
+                        u.Status.Description = "Incorrect username or password";
+                    }
+                    DataUtility.closeConnection(connection);
                 }
-                else
-                {
-                    u.Status.Code = StatusCode.NotFound;
-                    u.Status.Description = "Incorrect username or password";
-                }
-                DataUtility.closeConnection(connection);
+            }
+            catch (Exception ex)
+            {
+                u.Status.Description = ex.StackTrace;
             }
 
             return u;
@@ -101,40 +108,47 @@ namespace RiverWeb.Controllers
 
             MySqlConnection connection = DataUtility.getConnection();
 
-            if (connection != null && user != null && user.Username != "")
+            try
             {
-                string query = "SELECT UserId FROM Users WHERE Email=\"" + user.Email + "\"";
-                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-
-                if (!reader.HasRows)
+                if (connection != null && user != null && user.Username != "")
                 {
-                    query = "INSERT INTO Users (Username, Password, Email, ImageUrl) " +
-                        "VALUES (\"" + user.Username + "\",\"" + user.Password + "\",\"" + user.Email + "\","
-                            + (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ")";
-                    reader.Close();
-                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+                    string query = "SELECT UserId FROM Users WHERE Email=\"" + user.Email + "\"";
+                    MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
-                    if (reader.RecordsAffected > 0)
+                    if (!reader.HasRows)
                     {
-                        query = "SELECT LAST_INSERT_ID()";
+                        query = "INSERT INTO Users (Username, Password, Email, ImageUrl) " +
+                            "VALUES (\"" + user.Username + "\",\"" + user.Password + "\",\"" + user.Email + "\","
+                                + (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ")";
                         reader.Close();
                         reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
-                        if (reader.Read())
+                        if (reader.RecordsAffected > 0)
                         {
-                            u.UserId = reader.GetInt32(0);
-                        }
+                            query = "SELECT LAST_INSERT_ID()";
+                            reader.Close();
+                            reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
-                        u.Status.Code = StatusCode.OK;
-                        u.Status.Description = "Success creating user.";
+                            if (reader.Read())
+                            {
+                                u.UserId = reader.GetInt32(0);
+                            }
+
+                            u.Status.Code = StatusCode.OK;
+                            u.Status.Description = "Success creating user.";
+                        }
                     }
+                    else
+                    {
+                        u.Status.Code = StatusCode.AlreadyExists;
+                        u.Status.Description = "User already exists.";
+                    }
+                    DataUtility.closeConnection(connection);
                 }
-                else
-                {
-                    u.Status.Code = StatusCode.AlreadyExists;
-                    u.Status.Description = "User already exists.";
-                }
-                DataUtility.closeConnection(connection);
+            }
+            catch (Exception ex)
+            {
+                u.Status.Description = ex.StackTrace;
             }
 
             return u;
@@ -147,65 +161,72 @@ namespace RiverWeb.Controllers
             u.Status.Code = StatusCode.Error;
             MySqlConnection connection = DataUtility.getConnection();
 
-            if (connection != null &&user != null)
+            try
             {
-                string query = "SELECT * FROM Users WHERE spEmail='" + user.spEmail + "'";
-                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-
-                if (reader.Read())
+                if (connection != null &&user != null)
                 {
-                    u.UserId = DataUtility.getInt32(reader, "UserId");
-                    u.Username = DataUtility.getString(reader, "Username");
-                    u.Email = DataUtility.getString(reader, "Email");
-
-                    u.Status.Code = StatusCode.AlreadyExists;
-                    u.Status.Description = "Spotify account already linked to a user.";
-                }
-                else if (id == "0" || id == "")
-                {
-                    query = "INSERT INTO Users (spUsername, spCanonicalUsername, spEmail) VALUES ('" + user.spUsername +
-                            "','" + user.spCanonicalUsername + "','" + user.spEmail + "')";
-                    reader.Close();
-                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-
-                    if (reader.RecordsAffected > 0)
-                    {
-                        query = "SELECT LAST_INSERT_ID()";
-                        reader.Close();
-                        reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+                        string query = "SELECT * FROM Users WHERE spEmail='" + user.spEmail + "'";
+                        MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
                         if (reader.Read())
                         {
-                            u.UserId = reader.GetInt32(0);
+                            u.UserId = DataUtility.getInt32(reader, "UserId");
+                            u.Username = DataUtility.getString(reader, "Username");
+                            u.Email = DataUtility.getString(reader, "Email");
+
+                            u.Status.Code = StatusCode.AlreadyExists;
+                            u.Status.Description = "Spotify account already linked to a user.";
                         }
-                    }
+                        else if (id == "0" || id == "")
+                        {
+                            query = "INSERT INTO Users (spUsername, spCanonicalUsername, spEmail) VALUES ('" + user.spUsername +
+                                    "','" + user.spCanonicalUsername + "','" + user.spEmail + "')";
+                            reader.Close();
+                            reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
-                    u.Status.Code = StatusCode.NotFound;
-                    u.Status.Description = "New account created with spotidy information.";
+                            if (reader.RecordsAffected > 0)
+                            {
+                                query = "SELECT LAST_INSERT_ID()";
+                                reader.Close();
+                                reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+
+                                if (reader.Read())
+                                {
+                                    u.UserId = reader.GetInt32(0);
+                                }
+                            }
+
+                            u.Status.Code = StatusCode.NotFound;
+                            u.Status.Description = "New account created with spotidy information.";
+                        }
+                        else
+                        {
+                            query = "UPDATE Users SET spUsername='" + user.spUsername +
+                                "', spCanonicalUsername='" + user.spCanonicalUsername +
+                                "', spEmail='" + user.spEmail + "'" +
+                                "WHERE UserId=" + id;
+                            reader.Close();
+                            reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+
+                            query = "SELECT * FROM Users " +
+                                "WHERE UserId=" + id;
+                            reader.Close();
+                            reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+
+                            u.UserId = Convert.ToInt32(id);
+                            u.Username = DataUtility.getString(reader, "Username");
+                            u.Email = DataUtility.getString(reader, "Email");
+
+                            u.Status.Code = StatusCode.OK;
+                            u.Status.Description = "Spotify information linked to account.";
+                        }
+
+                        DataUtility.closeConnection(connection);
                 }
-                else
-                {
-                    query = "UPDATE Users SET spUsername='" + user.spUsername + 
-                        "', spCanonicalUsername='" + user.spCanonicalUsername + 
-                        "', spEmail='" + user.spEmail + "'" + 
-                        "WHERE UserId=" + id;
-                    reader.Close();
-                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-
-                    query = "SELECT * FROM Users " +
-                        "WHERE UserId=" + id;
-                    reader.Close();
-                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-
-                    u.UserId = Convert.ToInt32(id);
-                    u.Username = DataUtility.getString(reader, "Username");
-                    u.Email = DataUtility.getString(reader, "Email");
-
-                    u.Status.Code = StatusCode.OK;
-                    u.Status.Description = "Spotify information linked to account.";
-                }
-
-                DataUtility.closeConnection(connection);
+            }
+            catch (Exception ex)
+            {
+                u.Status.Description = ex.StackTrace;
             }
 
             return u;
@@ -220,48 +241,55 @@ namespace RiverWeb.Controllers
 
             MySqlConnection connection = DataUtility.getConnection();
 
-            if (connection != null && user != null && user.Username != "")
+            try
             {
-                string query = "";
-                query = "SELECT UserId FROM Users WHERE Email=\"" + user.Email + "\"";
-                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-
-                if (reader.Read())
+                if (connection != null && user != null && user.Username != "")
                 {
-                    query = "UPDATE Users " +
-                        "SET Password=\"" + user.Password + "\",Username=\"" + user.Username + "\",Email=\"" + user.Email +
-                            "\",ImageUrl=\"" + user.ImageUrl + "\" " +
-                        "WHERE Email = \"" + user.Email + "\" AND Password = \"" + user.Password + "\"";
-                    DataUtility.executeQuery(connection, query);
+                    string query = "";
+                    query = "SELECT UserId FROM Users WHERE Email=\"" + user.Email + "\"";
+                    MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+
+                    if (reader.Read())
+                    {
+                        query = "UPDATE Users " +
+                            "SET Password=\"" + user.Password + "\",Username=\"" + user.Username + "\",Email=\"" + user.Email +
+                                "\",ImageUrl=\"" + user.ImageUrl + "\" " +
+                            "WHERE Email = \"" + user.Email + "\" AND Password = \"" + user.Password + "\"";
+                        DataUtility.executeQuery(connection, query);
                     
-                    query = "SELECT UserId " +
-                        "FROM Users " +
-                        "WHERE Email = \"" + user.Email + "\" AND Password = \"" + user.Password + "\"";
-                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+                        query = "SELECT UserId " +
+                            "FROM Users " +
+                            "WHERE Email = \"" + user.Email + "\" AND Password = \"" + user.Password + "\"";
+                        reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
-                    u.UserId = reader.GetInt32(0);
-                    if (u.ReadUser(connection))
-                    {
-                        u.Status.Code = StatusCode.OK;
-                        u.Status.Description = "Success updating user.";
+                        u.UserId = reader.GetInt32(0);
+                        if (u.ReadUser(connection))
+                        {
+                            u.Status.Code = StatusCode.OK;
+                            u.Status.Description = "Success updating user.";
+                        }
                     }
-                }
-                else
-                {
-                    query = " INSERT INTO Users (Username, Password, FirstName, LastName, ImageUrl) " +
-                        "VALUES (\"" + user.Username + "\", \"" + user.Password + "\", \"" + user.Email + "\", " +
-                        (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ")";
-                    DataUtility.executeQuery(connection, query);
+                    else
+                    {
+                        query = " INSERT INTO Users (Username, Password, FirstName, LastName, ImageUrl) " +
+                            "VALUES (\"" + user.Username + "\", \"" + user.Password + "\", \"" + user.Email + "\", " +
+                            (user.ImageUrl == null ? "NULL" : "\"" + user.ImageUrl + "\"") + ")";
+                        DataUtility.executeQuery(connection, query);
 
-                    reader.Close();
-                    u.UserId = ((MySqlDataReader)DataUtility.executeQuery(connection, "SELECT LAST_INSERT_ID()")).GetInt32(0);
-                    if (u.ReadUser(connection))
-                    {
-                        u.Status.Code = StatusCode.OK;
-                        u.Status.Description = "Success updating user.";
+                        reader.Close();
+                        u.UserId = ((MySqlDataReader)DataUtility.executeQuery(connection, "SELECT LAST_INSERT_ID()")).GetInt32(0);
+                        if (u.ReadUser(connection))
+                        {
+                            u.Status.Code = StatusCode.OK;
+                            u.Status.Description = "Success updating user.";
+                        }
                     }
+                    DataUtility.closeConnection(connection);
                 }
-                DataUtility.closeConnection(connection);
+            }
+            catch (Exception ex)
+            {
+                u.Status.Description = ex.StackTrace;
             }
 
             return u;
