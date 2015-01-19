@@ -66,13 +66,15 @@ namespace RiverWeb.Models
                     reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
                     while (reader.Read())
                     {
+                        MySqlConnection connection2 = DataUtility.getConnection();
                         User u = new User();
                         u.UserId = DataUtility.getInt32(reader, "UserId");
-                        u.ReadUser(DataUtility.getConnection());
+                        u.ReadUser(connection2);
                         RoomUser ru = new RoomUser();
                         ru.User = u;
                         ru.Tokens = DataUtility.getInt32(reader, "Tokens");
                         this.Users.Add(ru);
+                        connection2.Close();
                     }
 
                     query = "SELECT * FROM RoomSongs WHERE RoomId = " + this.RoomId;
@@ -80,10 +82,12 @@ namespace RiverWeb.Models
                     reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
                     while (reader.Read())
                     {
+                        MySqlConnection connection2 = DataUtility.getConnection();
                         Song s = new Song();
                         s.SongId = DataUtility.getInt32(reader, "SongId");
-                        s.ReadSong(DataUtility.getConnection());
+                        s.ReadSong(connection2);
                         this.Songs.Add(s);
+                        connection2.Close();
                     }
 
                     return true;

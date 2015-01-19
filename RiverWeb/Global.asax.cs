@@ -24,7 +24,7 @@ namespace RiverWeb
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            AsynchronousSocketUtility.StartListening();
+            //AsynchronousSocketUtility.StartListening();
         }
     }
 }
