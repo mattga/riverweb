@@ -106,86 +106,111 @@ namespace RiverWeb.Controllers
             s.Status.Code = StatusCode.Error;
             MySqlConnection connection = DataUtility.getConnection();
 
-            if (connection != null)
+            try
             {
-                string query = "SELECT * FROM RoomSongs WHERE SourceId='" + song.SourceId + "' AND RoomId=" + id;
-                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-                if (reader.Read()) {
+                if (connection != null)
+                {
+                    string query = "SELECT * FROM RoomSongs WHERE SourceId='" + song.SourceId + "' AND RoomId=" + id;
+                    MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+                    if (reader.Read())
+                    {
 
-                    s.SongId = DataUtility.getInt32(reader, "SongId");
-                    s.RoomId = DataUtility.getInt32(reader, "RoomId");
-                    s.SourceId = DataUtility.getString(reader, "SourceId");
-                    s.Title = DataUtility.getString(reader, "Title");
-                    s.Artist = DataUtility.getString(reader, "Artist");
-                    s.Album = DataUtility.getString(reader, "Album");
-                    s.Thumbnail = DataUtility.getString(reader, "Thumbnail");
-                    s.Length = DataUtility.getInt32(reader, "Length");
-                    s.PublishedDate = DataUtility.getDateTime(reader, "PublishedDate");
-                    s.Tokens = DataUtility.getInt32(reader, "Tokens") + song.Tokens;
-                    s.CreatedDate = DataUtility.getDateTime(reader, "CreatedDate");
-                    s.Source = DataUtility.getString(reader, "Source");
+                        s.SongId = DataUtility.getInt32(reader, "SongId");
+                        s.RoomId = DataUtility.getInt32(reader, "RoomId");
+                        s.SourceId = DataUtility.getString(reader, "SourceId");
+                        s.Title = DataUtility.getString(reader, "Title");
+                        s.Artist = DataUtility.getString(reader, "Artist");
+                        s.Album = DataUtility.getString(reader, "Album");
+                        s.Thumbnail = DataUtility.getString(reader, "Thumbnail");
+                        s.Length = DataUtility.getInt32(reader, "Length");
+                        s.PublishedDate = DataUtility.getDateTime(reader, "PublishedDate");
+                        s.Tokens = DataUtility.getInt32(reader, "Tokens") + song.Tokens;
+                        s.CreatedDate = DataUtility.getDateTime(reader, "CreatedDate");
+                        s.Source = DataUtility.getString(reader, "Source");
 
-                    query = "UPDATE RoomSongs SET Tokens=Tokens+" + song.Tokens + " WHERE SongId=" + s.SongId;
-                    reader.Close();
-                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-
-                    if (reader.RecordsAffected > 0)
-                    {
-                        s.Status.Code = StatusCode.AlreadyExists;
-                        s.Status.Description = "Song already exists in this Room. Points added.";
-                    }
-                } else {
-                    query = "INSERT INTO RoomSongs (RoomId,SourceId,Title,Artist,Album,Length,PublishedDate,Source,Thumbnail,Tokens) VALUES (";
-                    query += id + ",'" + song.SourceId + "','" + song.Title + "','" + song.Artist + "',";
-                    if (song.Album != null)
-                    {
-                        query += "'" + song.Album + "',";
-                    }
-                    else
-                    {
-                        query += "NULL,";
-                    }
-                    query += song.Length + ",'" + song.PublishedDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + song.Source + "',";
-                    if (song.Thumbnail != null)
-                    {
-                        query += "'" + song.Thumbnail + "',";
-                    }
-                    else
-                    {
-                        query += "NULL,";
-                    }
-                    query += song.Tokens + ")";
-
-                    reader.Close();
-                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-
-                    if (reader.RecordsAffected > 0)
-                    {
-                        query = "SELECT * FROM RoomSongs, Rooms WHERE Rooms.RoomId=RoomSongs.RoomId AND SongId=LAST_INSERT_ID()";
+                        query = "UPDATE RoomSongs SET Tokens=Tokens+" + song.Tokens + " WHERE SongId=" + s.SongId;
                         reader.Close();
                         reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
 
-                        if (reader.Read())
+                        if (reader.RecordsAffected > 0)
                         {
-                            s.SongId = DataUtility.getInt32(reader, "SongId");
-                            s.RoomId = DataUtility.getInt32(reader, "RoomId");
-                            s.SourceId = DataUtility.getString(reader, "SourceId");
-                            s.Title = DataUtility.getString(reader, "Title");
-                            s.Artist = DataUtility.getString(reader, "Artist");
-                            s.Album = DataUtility.getString(reader, "Album");
-                            s.Thumbnail = DataUtility.getString(reader, "Thumbnail");
-                            s.Length = DataUtility.getInt32(reader, "Length");
-                            s.PublishedDate = DataUtility.getDateTime(reader, "PublishedDate");
-                            s.Tokens = DataUtility.getInt32(reader, "Tokens") + song.Tokens;
-                            s.CreatedDate = DataUtility.getDateTime(reader, "CreatedDate");
-                            s.Source = DataUtility.getString(reader, "Source");
-
-                            s.Status.Code = StatusCode.OK;
-                            s.Status.Description = DataUtility.OK;
+                            s.Status.Code = StatusCode.AlreadyExists;
+                            s.Status.Description = "Song already exists in this Room. Points added.";
                         }
                     }
+                    else
+                    {
+                        query = "INSERT INTO RoomSongs (RoomId,SourceId,Title,Artist,Album,Length,PublishedDate,Source,Thumbnail,Thumbnail_Lg,Tokens) VALUES (";
+                        query += id + ",'" + song.SourceId + "','" + song.Title + "','" + song.Artist + "',";
+                        if (song.Album != null)
+                        {
+                            query += "'" + song.Album + "',";
+                        }
+                        else
+                        {
+                            query += "NULL,";
+                        }
+                        query += song.Length + ",'" + song.PublishedDate.ToString("yyyy-MM-dd HH:mm:ss") + "','" + song.Source + "',";
+                        if (song.Thumbnail != null)
+                        {
+                            query += "'" + song.Thumbnail + "',";
+                        }
+                        else
+                        {
+                            query += "NULL,";
+                        }
+                        if (song.SourceId == "YT")
+                        {
+                            query += "'http://img.youtube.com/vi/" + song.SourceId + "/mqdefault.jpg',";
+                        }
+                        else
+                        {
+                            if (song.Thumbnail != null)
+                            {
+                                query += "'" + song.Thumbnail + "',";
+                            }
+                            else
+                            {
+                                query += "NULL,";
+                            }
+                        }
+                        query += song.Tokens + ")";
+
+                        reader.Close();
+                        reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+
+                        if (reader.RecordsAffected > 0)
+                        {
+                            query = "SELECT * FROM RoomSongs, Rooms WHERE Rooms.RoomId=RoomSongs.RoomId AND SongId=LAST_INSERT_ID()";
+                            reader.Close();
+                            reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+
+                            if (reader.Read())
+                            {
+                                s.SongId = DataUtility.getInt32(reader, "SongId");
+                                s.RoomId = DataUtility.getInt32(reader, "RoomId");
+                                s.SourceId = DataUtility.getString(reader, "SourceId");
+                                s.Title = DataUtility.getString(reader, "Title");
+                                s.Artist = DataUtility.getString(reader, "Artist");
+                                s.Album = DataUtility.getString(reader, "Album");
+                                s.Thumbnail = DataUtility.getString(reader, "Thumbnail");
+                                s.Length = DataUtility.getInt32(reader, "Length");
+                                s.PublishedDate = DataUtility.getDateTime(reader, "PublishedDate");
+                                s.Tokens = DataUtility.getInt32(reader, "Tokens") + song.Tokens;
+                                s.CreatedDate = DataUtility.getDateTime(reader, "CreatedDate");
+                                s.Source = DataUtility.getString(reader, "Source");
+
+                                s.Status.Code = StatusCode.OK;
+                                s.Status.Description = DataUtility.OK;
+                            }
+                        }
+                    }
+                    connection.Close();
                 }
-                connection.Close();
+            }
+            catch (Exception ex)
+            {
+                s.Status.Description = ex.StackTrace;
             }
 
             return s;
@@ -199,44 +224,51 @@ namespace RiverWeb.Controllers
 
             MySqlConnection connection = DataUtility.getConnection();
 
-            if (connection != null && room != null && room.RoomName != "")
+            try
             {
-
-                string query = "INSERT INTO Rooms " + 
-                                "(HostId,RoomName,isPrivate" + (room.isPrivate ? ",AccessCode," : ",") + "Latitude,Longitude) " +
-                                "VALUES (" + room.HostId + ",'" + room.RoomName + "'," + room.isPrivate +
-                                (room.isPrivate ? ","+room.AccessCode : "" ) + "," + room.Latitude + "," + room.Longitude + ")";
-                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-
-                if (reader.RecordsAffected > -1)
+                if (connection != null && room != null && room.RoomName != "")
                 {
-                    r.RoomName = room.RoomName;
 
-                    query = "SELECT LAST_INSERT_ID()";
-                    reader.Close();
-                    reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-                    if (reader.Read())
+                    string query = "INSERT INTO Rooms " +
+                                    "(HostId,RoomName,isPrivate" + (room.isPrivate ? ",AccessCode," : ",") + "Latitude,Longitude) " +
+                                    "VALUES (" + room.HostId + ",'" + room.RoomName + "'," + room.isPrivate +
+                                    (room.isPrivate ? "," + room.AccessCode : "") + "," + room.Latitude + "," + room.Longitude + ")";
+                    MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+
+                    if (reader.RecordsAffected > -1)
                     {
-                        r.RoomId = reader.GetInt32(0);
+                        r.RoomName = room.RoomName;
 
-                        query = "INSERT INTO RoomUsers VALUES (" + r.RoomId + "," + room.HostId + ",100)";
+                        query = "SELECT LAST_INSERT_ID()";
                         reader.Close();
                         reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-
-                        if (reader.RecordsAffected > 0)
+                        if (reader.Read())
                         {
-                            r.Status.Code = StatusCode.OK;
-                            r.Status.Description = "Room created successfully";
+                            r.RoomId = reader.GetInt32(0);
+
+                            query = "INSERT INTO RoomUsers VALUES (" + r.RoomId + "," + room.HostId + ",100)";
+                            reader.Close();
+                            reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+
+                            if (reader.RecordsAffected > 0)
+                            {
+                                r.Status.Code = StatusCode.OK;
+                                r.Status.Description = "Room created successfully";
+                            }
                         }
                     }
-                }
-                else
-                {
-                    r.Status.Code = StatusCode.AlreadyExists;
-                    r.Status.Description = "Room already exists";
-                }
+                    else
+                    {
+                        r.Status.Code = StatusCode.AlreadyExists;
+                        r.Status.Description = "Room already exists";
+                    }
 
-                connection.Close();
+                    connection.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                r.Status.Description = ex.StackTrace;
             }
 
             return r;
@@ -296,55 +328,61 @@ namespace RiverWeb.Controllers
         }
 
         [System.Web.Http.HttpPost]
-        public HttpResponseMessage JoinNearest(string id, User user)
+        public BaseModel JoinNearest(string id, User user)
         {
             BaseModel bm = new BaseModel();
             bm.Status.Code = StatusCode.Error;
-            HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, bm);
 
             MySqlConnection connection = DataUtility.getConnection();
 
-            if (connection != null && user != null && user.Username != "")
+            try
             {
-                string query = "SELECT *, " +
-                                "p.distance_unit " +
-                                         "* DEGREES(ACOS(COS(RADIANS(p.latpoint)) " +
-                                         "* COS(RADIANS(z.latitude)) " +
-                                         "* COS(RADIANS(p.longpoint) - RADIANS(z.longitude)) " +
-                                         "+ SIN(RADIANS(p.latpoint)) " +
-                                         "* SIN(RADIANS(z.latitude)))) AS distance_in_km " +
-                                "FROM Rooms AS z " +
-                                "JOIN ( " +
-                                    "SELECT " +  user.Latitude + " AS latpoint, " + user.Longitude + " AS longpoint, " +
-                                        "50.0 AS radius, 69.0 AS distance_unit " +
-                                ") AS p ON 1=1 " +
-                                "WHERE z.latitude " +
-                                    "BETWEEN p.latpoint  - (p.radius / p.distance_unit) " +
-                                        "AND p.latpoint  + (p.radius / p.distance_unit) " +
-                                "AND z.longitude " +
-                                    "BETWEEN p.longpoint - (p.radius / (p.distance_unit * COS(RADIANS(p.latpoint)))) " +
-                                        "AND p.longpoint + (p.radius / (p.distance_unit * COS(RADIANS(p.latpoint)))) " +
-                                "ORDER BY distance_in_km";
-
-                MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
-
-                if (reader.Read())
+                if (connection != null && user != null && user.Username != "")
                 {
-                    if (reader.GetInt32(0) > 0)
+                    string query = "SELECT *, " +
+                                    "p.distance_unit " +
+                                             "* DEGREES(ACOS(COS(RADIANS(p.latpoint)) " +
+                                             "* COS(RADIANS(z.latitude)) " +
+                                             "* COS(RADIANS(p.longpoint) - RADIANS(z.longitude)) " +
+                                             "+ SIN(RADIANS(p.latpoint)) " +
+                                             "* SIN(RADIANS(z.latitude)))) AS distance_in_km " +
+                                    "FROM Rooms AS z " +
+                                    "JOIN ( " +
+                                        "SELECT " + user.Latitude + " AS latpoint, " + user.Longitude + " AS longpoint, " +
+                                            "50.0 AS radius, 69.0 AS distance_unit " +
+                                    ") AS p ON 1=1 " +
+                                    "WHERE z.latitude " +
+                                        "BETWEEN p.latpoint  - (p.radius / p.distance_unit) " +
+                                            "AND p.latpoint  + (p.radius / p.distance_unit) " +
+                                    "AND z.longitude " +
+                                        "BETWEEN p.longpoint - (p.radius / (p.distance_unit * COS(RADIANS(p.latpoint)))) " +
+                                            "AND p.longpoint + (p.radius / (p.distance_unit * COS(RADIANS(p.latpoint)))) " +
+                                    "ORDER BY distance_in_km";
+
+                    MySqlDataReader reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
+
+                    if (reader.Read())
                     {
-                        bm.Status.Code = StatusCode.OK;
-                        bm.Status.Description = DataUtility.OK;
+                        if (reader.GetInt32(0) > 0)
+                        {
+                            bm.Status.Code = StatusCode.OK;
+                            bm.Status.Description = DataUtility.OK;
+                        }
+                        else
+                        {
+                            bm.Status.Code = StatusCode.NotFound;
+                            bm.Status.Description = "Room not found";
+                        }
                     }
-                    else
-                    {
-                        bm.Status.Code = StatusCode.NotFound;
-                        bm.Status.Description = "Room not found";
-                    }
+                    connection.Close();
                 }
-                connection.Close();
+            }
+            catch (Exception ex)
+            {
+                bm.Status.Description = ex.StackTrace;
             }
 
-            return response;
+            return bm;
         }
 
     }
