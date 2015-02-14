@@ -77,7 +77,7 @@ namespace RiverWeb.Models
                         connection2.Close();
                     }
 
-                    query = "SELECT * FROM RoomSongs WHERE RoomId = " + this.RoomId + " GROUP BY SongId ORDER BY Tokens";
+                    query = "SELECT * FROM RoomSongs WHERE RoomId = " + this.RoomId + " GROUP BY SongId ORDER BY Tokens DESC";
                     reader.Close();
                     reader = (MySqlDataReader)DataUtility.executeQuery(connection, query);
                     while (reader.Read())
